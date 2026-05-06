@@ -28,17 +28,23 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Questrial&display=swap');
         
-        /* Estilos Base obligatorios */
         html, body { 
             background-color: rgb(56, 65, 47) !important; 
             color: rgb(216, 203, 169);
             font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
 
         .font-quest { font-family: 'Questrial', sans-serif; }
 
-        /* Botones y Pestañas en Color Arena */
+        /* Estilo para los botones color Arena */
+        .btn-bissio {
+            background-color: rgb(216, 203, 169);
+            color: rgb(56, 65, 47);
+            font-weight: 900;
+        }
+
         .tab-active { 
             background-color: rgb(216, 203, 169) !important; 
             color: rgb(56, 65, 47) !important; 
@@ -51,7 +57,6 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { 
             background: rgb(216, 203, 169); 
             border-radius: 10px; 
@@ -62,31 +67,30 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="min-h-screen pb-12 overflow-x-hidden text-center sm:text-left bg-bissio-forest font-sans">
 
-    <!-- PANTALLA DE ACCESO POR WHITELIST -->
+    <!-- PANTALLA DE ACCESO -->
     <div id="lock-screen" class="fixed inset-0 bg-bissio-forest z-[200] flex flex-col items-center justify-center p-6 transition-all duration-500">
         <div class="max-w-md w-full bg-bissio-petrol p-8 rounded-3xl border-2 border-bissio-sand/20 shadow-2xl text-center">
-            <div class="bg-bissio-sand/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-bissio-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            </div>
-            <h2 class="text-2xl font-black uppercase italic text-bissio-sand mb-2 tracking-tighter font-quest">Estudio Bissio</h2>
-            <p class="text-bissio-sand/70 text-[10px] mb-6 uppercase font-bold tracking-[0.2em] font-quest">Identificación Corporativa</p>
+            <h2 class="text-2xl font-black uppercase italic text-bissio-sand mb-2 tracking-tighter font-quest text-center">Estudio Bissio</h2>
+            <p class="text-bissio-sand/70 text-[10px] mb-6 uppercase font-bold tracking-[0.2em] font-quest text-center">Identificación de Empleado</p>
             
             <div class="space-y-4 text-left font-quest">
                 <div>
-                    <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Email del Estudio</label>
+                    <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Email Corporativo</label>
                     <input type="email" id="access-email" placeholder="usuario@estudiobissio.com.ar" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-bissio-sand outline-none focus:border-bissio-sand transition-all text-sm font-bold shadow-inner">
                 </div>
                 <div>
-                    <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Código de Invitación</label>
-                    <input type="text" id="access-code" placeholder="CÓDIGO" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-center text-lg font-black tracking-widest text-bissio-sand outline-none focus:border-bissio-sand uppercase shadow-inner">
+                    <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Código de Acceso</label>
+                    <input type="text" id="access-code" placeholder="Pista: BISSIO2026" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-center text-lg font-black tracking-widest text-bissio-sand outline-none focus:border-bissio-sand uppercase shadow-inner">
                 </div>
             </div>
 
-            <button onclick="checkWhitelistAccess()" class="w-full bg-bissio-sand hover:brightness-110 text-bissio-forest font-black py-4 rounded-2xl mt-6 transition-all uppercase tracking-widest shadow-xl font-quest">Entrar a la Cancha</button>
+            <button onclick="checkWhitelistAccess()" class="w-full btn-bissio hover:brightness-110 py-4 rounded-2xl mt-6 transition-all uppercase tracking-widest shadow-xl font-quest">Entrar al Prode</button>
             <p id="access-error" class="text-red-400 text-[10px] mt-4 font-bold hidden uppercase font-quest">Email no autorizado o código incorrecto.</p>
         </div>
     </div>
@@ -99,22 +103,14 @@
 
     <header class="bg-bissio-petrol shadow-xl p-4 sticky top-0 z-50 border-b-4 border-bissio-petrol/30">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-bissio-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l9 5-9 5-9-5 9 5z"></path></svg>
-                <h1 class="text-xl font-black uppercase italic tracking-tighter text-bissio-sand font-quest">Prode Bissio 2026</h1>
-            </div>
+            <h1 class="text-xl font-black uppercase italic tracking-tighter text-bissio-sand font-quest">Prode Bissio 2026</h1>
             <div id="counter" class="text-[10px] font-bold bg-bissio-forest px-3 py-1.5 rounded-full border border-bissio-sand/20 text-bissio-sand shadow-inner font-quest">
-                0 / 104 LISTOS
+                0 / 104
             </div>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto mt-4 px-4">
-        <div id="conn-status" class="mb-4 text-[9px] text-bissio-sand/40 uppercase flex justify-between px-2 font-bold tracking-widest font-quest">
-            <span id="status-text">Conectando...</span>
-            <span id="uid-text">ID: ---</span>
-        </div>
-
         <nav class="flex bg-bissio-petrol rounded-xl p-1 shadow-2xl gap-1 mb-6">
             <button onclick="switchTab('jugar')" id="btn-jugar" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest tab-active text-bissio-forest font-quest">Jugar</button>
             <button onclick="switchTab('la-banda')" id="btn-la-banda" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-bissio-sand/50 font-quest">Posiciones</button>
@@ -126,12 +122,12 @@
         <section id="sec-jugar" class="space-y-6 text-left">
             <div class="bg-bissio-petrol p-5 rounded-2xl border border-bissio-petrol/50 shadow-xl">
                 <label class="block text-bissio-sand font-bold mb-2 uppercase text-[10px] tracking-widest font-quest">Tu Nombre para el Ranking</label>
-                <input type="text" id="username" placeholder="Ej: Juan Pérez" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-bissio-sand focus:border-bissio-sand outline-none transition-all text-lg font-bold shadow-inner">
+                <input type="text" id="username" placeholder="Tu Nombre" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-bissio-sand focus:border-bissio-sand outline-none transition-all text-lg font-bold shadow-inner">
                 <p id="user-email-display" class="text-[9px] text-bissio-sand/30 mt-2 italic font-bold uppercase tracking-widest"></p>
             </div>
 
             <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="filterPhase('groups')" id="f-groups" class="px-5 py-2 rounded-full bg-bissio-sand text-bissio-forest font-bold text-[10px] uppercase border-2 border-bissio-sand font-quest">Grupos</button>
+                <button onclick="filterPhase('groups')" id="f-groups" class="px-5 py-2 rounded-full tab-active font-bold text-[10px] uppercase border-2 border-bissio-sand font-quest">Grupos</button>
                 <button onclick="filterPhase('k32')" id="f-k32" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">16vos</button>
                 <button onclick="filterPhase('k16')" id="f-k16" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Octavos</button>
                 <button onclick="filterPhase('final')" id="f-final" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Finales</button>
@@ -140,52 +136,39 @@
             <div id="groups-container" class="space-y-4"></div>
 
             <div class="mt-8 flex justify-center pb-12">
-                <button onclick="saveProde()" id="btn-save" class="w-full bg-bissio-sand hover:brightness-110 text-bissio-forest font-black py-4 rounded-2xl flex items-center justify-center gap-3 shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm font-quest">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                <button onclick="saveProde()" id="btn-save" class="w-full btn-bissio hover:brightness-110 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm font-quest">
                     <span>Guardar mi Pronóstico</span>
                 </button>
             </div>
         </section>
 
         <section id="sec-la-banda" class="hidden bg-bissio-petrol p-6 rounded-3xl border border-bissio-petrol/50 shadow-2xl">
-            <h2 class="text-xl font-black mb-6 flex items-center gap-3 uppercase italic text-bissio-sand justify-center sm:justify-start font-quest">
-                <svg class="w-6 h-6 text-bissio-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Ranking del Estudio
-            </h2>
-            <div id="participants-list" class="grid gap-3"></div>
+            <h2 class="text-xl font-black mb-6 uppercase text-bissio-sand font-quest">Ranking del Estudio</h2>
+            <div id="participants-list" class="grid gap-3 text-left"></div>
         </section>
 
         <section id="sec-reglas" class="hidden bg-bissio-petrol p-8 rounded-3xl border border-bissio-petrol/50 shadow-2xl text-left">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="rules-title" onclick="adminClick()" class="text-3xl font-black italic text-bissio-sand uppercase tracking-tighter cursor-pointer select-none font-quest">Reglas</h2>
-                <span id="admin-hint" class="text-[8px] text-bissio-sand/50 font-bold uppercase tracking-widest opacity-0 font-quest">Modo Maestro Activado</span>
-            </div>
-            <div class="space-y-6">
-                <div class="flex gap-4 items-start">
-                    <div class="bg-bissio-sand text-bissio-forest font-black px-4 py-2 rounded-xl text-2xl h-fit shadow-md font-quest">3</div>
-                    <div><h3 class="text-lg font-black text-bissio-sand uppercase italic tracking-tighter font-quest">Pleno</h3><p class="text-bissio-sand/60 text-sm">Goles exactos de ambos equipos.</p></div>
+            <h2 id="rules-title" onclick="adminClick()" class="text-3xl font-black italic text-bissio-sand uppercase tracking-tighter cursor-pointer font-quest">Reglas</h2>
+            <div class="mt-6 space-y-6">
+                <div class="flex gap-4">
+                    <div class="btn-bissio px-4 py-2 rounded-xl text-2xl h-fit">3</div>
+                    <div><h3 class="font-black text-bissio-sand uppercase font-quest">Pleno</h3><p class="text-bissio-sand/60 text-sm">Goles exactos de ambos.</p></div>
                 </div>
-                <div class="flex gap-4 border-t border-bissio-forest pt-6 items-start">
-                    <div class="bg-bissio-sand/20 text-bissio-sand font-black px-4 py-2 rounded-xl text-2xl h-fit shadow-md font-quest">1</div>
-                    <div><h3 class="text-lg font-black text-bissio-sand uppercase italic tracking-tighter font-quest">Tendencia</h3><p class="text-bissio-sand/60 text-sm">Acertás quién gana o empate.</p></div>
+                <div class="flex gap-4 border-t border-bissio-forest pt-6">
+                    <div class="bg-bissio-sand/20 text-bissio-sand border border-bissio-sand px-4 py-2 rounded-xl text-2xl h-fit">1</div>
+                    <div><h3 class="font-black text-bissio-sand uppercase font-quest">Tendencia</h3><p class="text-bissio-sand/60 text-sm">Acertás ganador o empate.</p></div>
                 </div>
             </div>
 
-            <!-- PANEL ADMIN -->
-            <div id="admin-panel" class="hidden mt-10 p-6 bg-bissio-forest rounded-2xl border-2 border-bissio-sand/20 shadow-2xl">
-                <h3 class="text-bissio-sand font-black uppercase italic mb-4 text-center font-quest">Mesa de Control</h3>
+            <div id="admin-panel" class="hidden mt-10 p-6 bg-bissio-forest rounded-2xl border-2 border-bissio-sand shadow-2xl">
+                <h3 class="text-bissio-sand font-black uppercase text-center font-quest mb-4">Mesa de Control</h3>
                 <div class="flex bg-bissio-petrol p-1 rounded-xl mb-4 gap-1">
-                    <button onclick="switchAdminTab('teams')" id="tab-adm-teams" class="flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest">Equipos</button>
-                    <button onclick="switchAdminTab('scores')" id="tab-adm-scores" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest">Goles</button>
-                    <button onclick="switchAdminTab('security')" id="tab-adm-security" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest">Acceso</button>
+                    <button onclick="switchAdminTab('teams')" id="tab-adm-teams" class="flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg">Equipos</button>
+                    <button onclick="switchAdminTab('scores')" id="tab-adm-scores" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50">Goles</button>
                 </div>
                 <div id="admin-teams-view" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
-                <div id="admin-scores-view" class="hidden space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar text-bissio-sand"></div>
-                <div id="admin-security-view" class="hidden p-4 bg-bissio-petrol rounded-xl space-y-4">
-                    <label class="block text-bissio-sand font-bold uppercase text-[10px] font-quest">Código Maestro de Invitación</label>
-                    <input type="text" id="adm-security-code" class="w-full bg-bissio-forest border border-bissio-sand/20 rounded p-2 text-bissio-sand font-bold outline-none font-quest" placeholder="Escribí el código aquí">
-                </div>
-                <button onclick="saveAdminData()" class="mt-6 w-full bg-bissio-sand hover:brightness-110 text-bissio-forest font-black py-3 rounded-xl font-bold uppercase text-xs font-quest">Publicar Cambios Oficiales</button>
+                <div id="admin-scores-view" class="hidden space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                <button onclick="saveAdminData()" class="mt-6 w-full btn-bissio py-3 rounded-xl font-bold uppercase text-xs font-quest">Publicar Cambios</button>
             </div>
         </section>
     </main>
@@ -195,23 +178,20 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // --- WHITELIST DE EMPLEADOS AUTORIZADOS ---
+        // CONFIGURACIÓN MAESTRA
+        const MASTER_ACCESS_CODE = "BISSIO2026";
         const ALLOWED_EMAILS = [
-            'maestro@prode.com',
-            'lmartins@estudiobissio.com.ar', 'imartins@estudiobissio.com.ar', 'sprandi@estudiobissio.com.ar',
-            'panria@estudiobissio.com.ar', 'nr.artech@gmail.com', 'elizabeth.perez@geatech.ar',
-            'rfernandez@estudiobissio.com.ar', 'bdieguez@estudiobissio.com.ar', 'mrojas@estudiobissio.com.ar',
-            'ndussich@estudiobissio.com.ar', 'laguirre@estudiobissio.com.ar', 'ecabana@estudiobissio.com.ar',
-            'atoledo@estudiobissio.com.ar', 'mabalos@estudiobissio.com.ar', 'fdimartino@estudiobissio.com.ar',
-            'dlares@estudiobissio.com.ar', 'mdasilva@estudiobissio.com.ar', 'afarias@estudiobissio.com.ar',
-            'cblanco@estudiobissio.com.ar', 'aassmann@estudiobissio.com.ar', 'agirasole@estudiobissio.com.ar',
-            'cmamchur@estudiobissio.com.ar', 'dmonteleone@estudiobissio.com.ar', 'mgonzalez@estudiobissio.com.ar',
-            'spilaria@estudiobissio.com.ar', 'mreyes@estudiobissio.com.ar', 'jpallotta@estudiobissio.com.ar',
-            'icastillo@estudiobissio.com.ar', 'cgarro@estudiobissio.com.ar', 'dtabuchini@estudiobissio.com.ar',
-            'tavalos@estudiobissio.com.ar', 'mercolano@estudiobissio.com.ar', 'klopez@estudiobissio.com.ar',
-            'citurri@estudiobissio.com.ar', 'tlarrosa@estudiobissio.com.ar', 'dsaucedo@estudiobissio.com.ar',
-            'eluna@estudiobissio.com.ar', 'lara.bissio@estudiobissio.com.ar', 'tjuynevich@estudiobissio.com.ar', 'jhbissio@estudiobissio.com.ar',
-            'hdbissio@estudiobissio.com.ar', 'labissio@estudiobissio.com.ar', 'rafael.lopez.jordan@gmail.com'
+            'maestro@prode.com', 'lmartins@estudiobissio.com.ar', 'imartins@estudiobissio.com.ar', 'sprandi@estudiobissio.com.ar',
+            'panria@estudiobissio.com.ar', 'nr.artech@gmail.com', 'elizabeth.perez@geatech.ar', 'rfernandez@estudiobissio.com.ar',
+            'bdieguez@estudiobissio.com.ar', 'mrojas@estudiobissio.com.ar', 'ndussich@estudiobissio.com.ar', 'laguirre@estudiobissio.com.ar',
+            'ecabana@estudiobissio.com.ar', 'atoledo@estudiobissio.com.ar', 'mabalos@estudiobissio.com.ar', 'fdimartino@estudiobissio.com.ar',
+            'dlares@estudiobissio.com.ar', 'mdasilva@estudiobissio.com.ar', 'afarias@estudiobissio.com.ar', 'cblanco@estudiobissio.com.ar',
+            'aassmann@estudiobissio.com.ar', 'agirasole@estudiobissio.com.ar', 'cmamchur@estudiobissio.com.ar', 'dmonteleone@estudiobissio.com.ar',
+            'mgonzalez@estudiobissio.com.ar', 'spilaria@estudiobissio.com.ar', 'mreyes@estudiobissio.com.ar', 'jpallotta@estudiobissio.com.ar',
+            'icastillo@estudiobissio.com.ar', 'cgarro@estudiobissio.com.ar', 'dtabuchini@estudiobissio.com.ar', 'tavalos@estudiobissio.com.ar',
+            'mercolano@estudiobissio.com.ar', 'klopez@estudiobissio.com.ar', 'citurri@estudiobissio.com.ar', 'tlarrosa@estudiobissio.com.ar',
+            'dsaucedo@estudiobissio.com.ar', 'eluna@estudiobissio.com.ar', 'lara.bissio@estudiobissio.com.ar', 'tjuynevich@estudiobissio.com.ar',
+            'jhbissio@estudiobissio.com.ar', 'hdbissio@estudiobissio.com.ar', 'labissio@estudiobissio.com.ar'
         ];
 
         const firebaseConfig = {
@@ -238,24 +218,19 @@
         const GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
         GROUP_LETTERS.forEach((letter, gIdx) => {
             const teamIds = [`g${gIdx*4+1}`, `g${gIdx*4+2}`, `g${gIdx*4+3}`, `g${gIdx*4+4}`];
-            const games = [[0,1], [2,3], [0,2], [1,3], [0,3], [1,2]];
-            games.forEach(idx => MATCH_DEFS.push({ id: mid++, phase: 'groups', title: `Grupo ${letter}`, t1: teamIds[idx[0]], t2: teamIds[idx[1]] }));
+            [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]].forEach(idx => MATCH_DEFS.push({ id: mid++, phase: 'groups', title: `Grupo ${letter}`, t1: teamIds[idx[0]], t2: teamIds[idx[1]] }));
         });
-        for(let i=0; i<16; i++) MATCH_DEFS.push({ id: mid++, phase: 'k32', title: '16vos de Final', t1: `k${i*2+1}`, t2: `k${i*2+2}`, isK: true });
-        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'k16', title: 'Octavos de Final', t1: `k${33+i*2}`, t2: `k${33+i*2+1}`, isK: true });
-        for(let i=0; i<4; i++) MATCH_DEFS.push({ id: mid++, phase: 'k8', title: 'Cuartos de Final', t1: `k${49+i*2}`, t2: `k${49+i*2+1}`, isK: true });
-        for(let i=0; i<2; i++) MATCH_DEFS.push({ id: mid++, phase: 'k4', title: 'Semifinales', t1: `k${57+i*2}`, t2: `k${57+i*2+1}`, isK: true });
-        MATCH_DEFS.push({ id: 103, phase: 'final', title: 'Tercer Puesto', t1: 'k61', t2: 'k62', isK: true });
-        MATCH_DEFS.push({ id: 104, phase: 'final', title: 'GRAN FINAL', t1: 'k63', t2: 'k64', isK: true });
+        for(let i=0; i<16; i++) MATCH_DEFS.push({ id: mid++, phase: 'k32', title: '16vos', t1: `k${i*2+1}`, t2: `k${i*2+2}`, isK: true });
+        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'k16', title: 'Octavos', t1: `k${33+i*2}`, t2: `k${33+i*2+1}`, isK: true });
+        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'final', title: 'Fases Finales', t1: `k${49+i*2}`, t2: `k${49+i*2+1}`, isK: true });
 
         let currentUserId = null;
         let myPredictions = {};
         let realResults = {};
         let activePhase = 'groups';
         let participantsData = [];
-        let clickCount = 0;
-        let requiredAccessCode = '';
         let authenticatedEmail = '';
+        let clickCount = 0;
 
         window.addEventListener('load', async () => {
             renderAdminForms();
@@ -269,12 +244,12 @@
             if (user) {
                 currentUserId = user.uid;
                 document.getElementById('status-text').innerText = "ESTADIO CONECTADO";
-                document.getElementById('uid-text').innerText = `ID: ${user.uid.substring(0, 8)}...`;
                 document.getElementById('loading-overlay').style.opacity = '0';
                 setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
                 listenToConfig();
                 listenToMyData();
                 listenToParticipants();
+                checkWhitelistAccess(true);
             }
         });
 
@@ -284,8 +259,6 @@
                     const data = snap.data();
                     if (data.results) realResults = data.results;
                     if (data.teams) masterTeams = { ...masterTeams, ...data.teams };
-                    if (data.accessCode) requiredAccessCode = data.accessCode;
-                    checkWhitelistAccess(true);
                     renderGroups();
                     updateParticipantsUI();
                     applyConfigToAdmin();
@@ -297,14 +270,16 @@
             const email = isAuto ? localStorage.getItem('prode_email') : document.getElementById('access-email').value.trim().toLowerCase();
             const code = isAuto ? localStorage.getItem('prode_access') : document.getElementById('access-code').value.trim().toUpperCase();
             if (!email || !code) return;
+
             const isEmailAllowed = ALLOWED_EMAILS.some(e => e.toLowerCase() === email);
-            const isCodeCorrect = code === requiredAccessCode;
+            const isCodeCorrect = code === MASTER_ACCESS_CODE;
+
             if (isEmailAllowed && isCodeCorrect) {
                 authenticatedEmail = email;
                 localStorage.setItem('prode_email', email);
                 localStorage.setItem('prode_access', code);
                 document.getElementById('lock-screen').classList.add('hidden');
-                document.getElementById('user-email-display').innerText = `AUTORIZADO: ${email}`;
+                document.getElementById('user-email-display').innerText = `IDENTIDAD ESTUDIO: ${email}`;
             } else if (!isAuto) {
                 document.getElementById('access-error').classList.remove('hidden');
             }
@@ -326,13 +301,13 @@
                 card.className = "match-card flex items-center justify-between bg-bissio-petrol/20 p-4 rounded-2xl border border-bissio-petrol/50 transition-all";
                 card.innerHTML = `
                     <div class="flex-1 flex justify-end items-center gap-2 text-right">
-                        <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase">${masterTeams[m.t1]}</span>
-                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none focus:border-bissio-sand transition-all">
+                        <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase tracking-tight">${masterTeams[m.t1] || m.t1}</span>
+                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none">
                     </div>
                     <div class="px-2 text-bissio-sand/50 font-black text-[8px] uppercase text-center font-quest">vs</div>
                     <div class="flex-1 flex justify-start items-center gap-2">
-                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none focus:border-bissio-sand transition-all">
-                        <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase tracking-tight">${masterTeams[m.t2]}</span>
+                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none">
+                        <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase tracking-tight">${masterTeams[m.t2] || m.t2}</span>
                     </div>`;
                 container.appendChild(card);
             });
@@ -341,11 +316,11 @@
         window.filterPhase = (p) => {
             activePhase = p;
             document.querySelectorAll('[onclick^="filterPhase"]').forEach(b => {
-                b.classList.remove('bg-bissio-sand', 'text-bissio-forest', 'shadow-lg');
+                b.classList.remove('tab-active');
                 b.classList.add('bg-bissio-petrol', 'text-bissio-sand/50');
             });
             const btn = document.getElementById(`f-${p}`);
-            btn.classList.add('bg-bissio-sand', 'text-bissio-forest', 'shadow-lg');
+            btn.classList.add('tab-active');
             btn.classList.remove('bg-bissio-petrol', 'text-bissio-sand/50');
             renderGroups();
         };
@@ -353,23 +328,18 @@
         window.updatePredict = (id, side, val) => {
             if (!myPredictions[id]) myPredictions[id] = {};
             myPredictions[id][side] = val === "" ? null : parseInt(val);
-            updateCounter();
-        };
-
-        function updateCounter() {
             const count = Object.values(myPredictions).filter(p => p.home !== null && p.away !== null).length;
-            document.getElementById('counter').innerText = `${count} / 104 LISTOS`;
-        }
+            document.getElementById('counter').innerText = `${count} / 104`;
+        };
 
         window.saveProde = async () => {
             const name = document.getElementById('username').value.trim();
             if (!name) return showNotify("¡Poné tu nombre!", "error");
-            if (!authenticatedEmail) return showNotify("Sesión no válida.", "error");
             try {
                 await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId), {
                     username: name, email: authenticatedEmail, predictions: myPredictions, updatedAt: new Date().toISOString()
                 });
-                showNotify("¡PRONÓSTICOS GUARDADOS!", "success");
+                showNotify("PRONÓSTICOS GUARDADOS", "success");
             } catch (e) { showNotify("Error al guardar.", "error"); }
         };
 
@@ -378,16 +348,16 @@
             const scView = document.getElementById('admin-scores-view');
             let tmHtml = '';
             GROUP_LETTERS.forEach((l, i) => {
-                tmHtml += `<div class="p-2 bg-bissio-petrol rounded font-black text-[8px] uppercase text-bissio-sand tracking-widest font-quest">GRUPO ${l}</div>`;
+                tmHtml += `<div class="p-2 bg-bissio-petrol rounded font-black text-[8px] uppercase text-bissio-sand">GRUPO ${l}</div>`;
                 for(let j=1; j<=4; j++) {
                     const id = `g${i*4+j}`;
-                    tmHtml += `<div class="flex items-center gap-2 bg-bissio-forest p-2 rounded border border-bissio-petrol/30"><span class="text-[8px] text-bissio-sand/30 w-4 font-quest">${id}</span><input type="text" id="adm-tm-${id}" class="bg-transparent text-bissio-sand text-[10px] outline-none w-full border-b border-bissio-petrol uppercase font-bold"></div>`;
+                    tmHtml += `<div class="flex items-center gap-2 bg-bissio-forest p-2 rounded"><span class="text-[8px] text-bissio-sand/30 w-4">${id}</span><input type="text" id="adm-tm-${id}" class="bg-transparent text-bissio-sand text-[10px] outline-none w-full border-b border-bissio-petrol uppercase font-bold"></div>`;
                 }
             });
             tmView.innerHTML = tmHtml;
             let scHtml = '';
             MATCH_DEFS.forEach(m => {
-                scHtml += `<div class="flex items-center justify-between bg-bissio-petrol p-2 rounded-lg border border-bissio-petrol/50 text-[9px]"><span class="w-16 truncate uppercase text-bissio-sand/50 font-quest">${m.id}. ${m.title}</span><div class="flex gap-1"><input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"><input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"></div></div>`;
+                scHtml += `<div class="flex items-center justify-between bg-bissio-petrol p-2 rounded-lg border border-bissio-petrol/50 text-[9px]"><span class="w-16 truncate uppercase text-bissio-sand">${m.id}. ${m.title}</span><div class="flex gap-1"><input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"><input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"></div></div>`;
             });
             scView.innerHTML = scHtml;
         }
@@ -403,12 +373,10 @@
                 if (h) h.value = scores.home;
                 if (a) a.value = scores.away;
             });
-            document.getElementById('adm-security-code').value = requiredAccessCode;
         }
 
         window.saveAdminData = async () => {
             const results = {}; const teams = {};
-            const newAccessCode = document.getElementById('adm-security-code').value.trim().toUpperCase();
             MATCH_DEFS.forEach(m => {
                 const h = document.getElementById(`adm-h-${m.id}`).value;
                 const a = document.getElementById(`adm-a-${m.id}`).value;
@@ -419,9 +387,36 @@
                 if (el) teams[id] = el.value;
             });
             try {
-                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, accessCode: newAccessCode, updatedAt: new Date().toISOString() });
-                showNotify("ESTADIO ACTUALIZADO", "success");
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, updatedAt: new Date().toISOString() });
+                showNotify("ACTUALIZADO", "success");
             } catch (e) { showNotify("Error admin.", "error"); }
+        };
+
+        window.adminClick = () => {
+            clickCount++;
+            if (clickCount >= 5) {
+                document.getElementById('admin-panel').classList.toggle('hidden');
+                showNotify("MESA DE CONTROL ABIERTA", "success");
+                clickCount = 0;
+            }
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('text-bissio-sand/50');
+            });
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('tab-active');
+            document.getElementById(`btn-${tab}`).classList.remove('text-bissio-sand/50');
+        };
+
+        window.switchAdminTab = (t) => {
+            document.getElementById('admin-scores-view').classList.toggle('hidden', t !== 'scores');
+            document.getElementById('admin-teams-view').classList.toggle('hidden', t !== 'teams');
+            document.getElementById('tab-adm-teams').className = t === 'teams' ? "flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
+            document.getElementById('tab-adm-scores').className = t === 'scores' ? "flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
         };
 
         function calculatePoints(preds, reals) {
@@ -445,8 +440,8 @@
             list.innerHTML = '';
             sorted.forEach((p, idx) => {
                 const item = document.createElement('div');
-                item.className = `flex justify-between items-center bg-bissio-petrol/40 p-4 rounded-2xl border border-bissio-petrol/50 ${p.id === currentUserId ? 'border-bissio-sand ring-1 ring-bissio-sand shadow-xl' : ''}`;
-                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-bissio-sand italic uppercase font-quest">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-bissio-sand/50 font-bold uppercase tracking-widest">${p.email || '---'}</span></div><div class="bg-bissio-sand text-bissio-forest px-4 py-1.5 rounded-full text-xs font-black shadow-lg font-quest">${p.points} PTS</div>`;
+                item.className = `flex justify-between items-center bg-bissio-petrol/40 p-4 rounded-2xl border border-bissio-petrol/50 ${p.id === currentUserId ? 'border-bissio-sand shadow-xl' : ''}`;
+                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-bissio-sand italic uppercase tracking-tight font-quest">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-bissio-sand/50 font-bold uppercase tracking-[0.1em]">${p.email || '---'}</span></div><div class="bg-bissio-sand text-bissio-forest px-4 py-1.5 rounded-full text-xs font-black shadow-lg font-quest">${p.points} PTS</div>`;
                 list.appendChild(item);
             });
         }
@@ -457,7 +452,7 @@
                     const data = snap.data();
                     if (data.username) document.getElementById('username').value = data.username;
                     myPredictions = data.predictions || {};
-                    updateCounter(); renderGroups();
+                    renderGroups();
                 }
             });
         }
@@ -469,35 +464,6 @@
                 updateParticipantsUI();
             });
         }
-
-        window.adminClick = () => {
-            clickCount++;
-            if (clickCount >= 5) {
-                document.getElementById('admin-panel').classList.toggle('hidden');
-                document.getElementById('admin-hint').style.opacity = '1';
-                clickCount = 0;
-            }
-        };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('tab-active');
-                b.classList.add('text-bissio-sand/50');
-            });
-            document.getElementById(`sec-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}`).classList.add('tab-active');
-            document.getElementById(`btn-${tab}`).classList.remove('text-bissio-sand/50');
-        };
-
-        window.switchAdminTab = (t) => {
-            document.getElementById('admin-scores-view').classList.toggle('hidden', t !== 'scores');
-            document.getElementById('admin-teams-view').classList.toggle('hidden', t !== 'teams');
-            document.getElementById('admin-security-view').classList.toggle('hidden', t !== 'security');
-            document.getElementById('tab-adm-teams').className = t === 'teams' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
-            document.getElementById('tab-adm-scores').className = t === 'scores' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
-            document.getElementById('tab-adm-security').className = t === 'security' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
-        };
 
         function showNotify(msg, type) {
             const div = document.getElementById('notification');
