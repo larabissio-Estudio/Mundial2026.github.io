@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prode Mundial 2026 - El Maestro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .tab-active { @apply bg-emerald-500 text-white shadow-lg scale-105; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .match-card:focus-within { @apply border-emerald-500 ring-1 ring-emerald-500; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+        .phase-btn-active { @apply bg-emerald-500 text-slate-900 border-emerald-500; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 overflow-x-hidden text-center sm:text-left">
+
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-emerald-500 font-black uppercase italic tracking-widest animate-pulse">Abriendo el Estadio...</p>
+    </div>
+
+    <header class="bg-emerald-600 shadow-xl p-4 sticky top-0 z-50 border-b-4 border-emerald-500">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l9 5-9 5-9-5 9 5z"></path></svg>
+                <h1 class="text-xl font-black uppercase italic tracking-tighter text-white">Prode 2026</h1>
+            </div>
+            <div id="counter" class="text-[10px] font-bold bg-emerald-800 px-3 py-1.5 rounded-full border border-emerald-500 text-yellow-300 shadow-inner">
+                0 / 104 LISTOS
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto mt-4 px-4">
+        <div id="conn-status" class="mb-4 text-[9px] text-slate-500 uppercase flex justify-between px-2 font-bold">
+            <span id="status-text">Conectando...</span>
+            <span id="uid-text">ID: ---</span>
+        </div>
+
+        <nav class="flex bg-slate-800 rounded-xl p-1 shadow-2xl gap-1 mb-6">
+            <button onclick="switchTab('jugar')" id="btn-jugar" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest tab-active text-white">Jugar</button>
+            <button onclick="switchTab('la-banda')" id="btn-la-banda" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-slate-400">Posiciones</button>
+            <button onclick="switchTab('reglas')" id="btn-reglas" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-slate-400">Reglas</button>
+        </nav>
+
+        <div id="notification" class="hidden fixed bottom-4 left-4 right-4 z-[60] p-4 rounded-xl border-2 flex items-center justify-center gap-3 shadow-2xl animate-bounce text-center font-bold"></div>
+
+        <section id="sec-jugar" class="space-y-6 text-left">
+            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl flex flex-col sm:flex-row gap-4 items-end">
+                <div class="flex-1 w-full">
+                    <label class="block text-emerald-400 font-bold mb-2 uppercase text-[10px] tracking-widest">Tu Identidad</label>
+                    <input type="text" id="username" placeholder="Ej: Messi10" class="w-full bg-slate-900 border-2 border-slate-700 rounded-xl p-3 text-white focus:border-emerald-500 outline-none transition-all text-lg font-bold shadow-inner">
+                </div>
+                <button onclick="copyLink()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 p-3 rounded-xl transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-slate-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                    Invitar Amigos
+                </button>
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                <button onclick="filterPhase('groups')" id="f-groups" class="px-4 py-2 rounded-full bg-emerald-500 text-slate-900 font-bold text-[10px] uppercase border-2 border-emerald-500">Grupos</button>
+                <button onclick="filterPhase('k32')" id="f-k32" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">16vos</button>
+                <button onclick="filterPhase('k16')" id="f-k16" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">Octavos</button>
+                <button onclick="filterPhase('k8')" id="f-k8" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">Cuartos</button>
+                <button onclick="filterPhase('final')" id="f-final" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">Finales</button>
+            </div>
+
+            <div id="groups-container" class="space-y-4"></div>
+
+            <div class="mt-8 flex justify-center pb-12">
+                <button onclick="saveProde()" id="btn-save" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-4 rounded-2xl flex items-center justify-center gap-3 shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    <span>Guardar mi Prode</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="sec-la-banda" class="hidden bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-2xl">
+            <h2 class="text-xl font-black mb-6 flex items-center gap-3 uppercase italic text-white justify-center sm:justify-start">
+                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Ranking General
+            </h2>
+            <div id="participants-list" class="grid gap-3"></div>
+        </section>
+
+        <section id="sec-reglas" class="hidden bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl text-left">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="rules-title" onclick="adminClick()" class="text-3xl font-black italic text-emerald-400 uppercase tracking-tighter cursor-pointer select-none">Reglas</h2>
+                <span id="admin-hint" class="text-[8px] text-emerald-500 font-bold uppercase tracking-widest opacity-0">Modo Maestro</span>
+            </div>
+            <div class="space-y-6">
+                <div class="flex gap-4 items-start">
+                    <div class="bg-emerald-500 text-slate-900 font-black px-4 py-2 rounded-xl text-2xl h-fit">3</div>
+                    <div><h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Pleno</h3><p class="text-slate-400 text-sm">Goles exactos de ambos.</p></div>
+                </div>
+                <div class="flex gap-4 border-t border-slate-700 pt-6 items-start">
+                    <div class="bg-blue-500 text-slate-900 font-black px-4 py-2 rounded-xl text-2xl h-fit">1</div>
+                    <div><h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Tendencia</h3><p class="text-slate-400 text-sm">Acertás quién gana o empate.</p></div>
+                </div>
+            </div>
+
+            <div id="admin-panel" class="hidden mt-10 p-6 bg-slate-900 rounded-2xl border-2 border-emerald-500 shadow-2xl">
+                <h3 class="text-emerald-400 font-black uppercase italic mb-4 text-center">Mesa de Control</h3>
+                <div class="flex bg-slate-800 p-1 rounded-xl mb-4 gap-1">
+                    <button onclick="switchAdminTab('teams')" id="tab-adm-teams" class="flex-1 py-1 text-[8px] font-bold uppercase bg-emerald-500 text-slate-900 rounded-lg transition-all">Equipos</button>
+                    <button onclick="switchAdminTab('scores')" id="tab-adm-scores" class="flex-1 py-1 text-[8px] font-bold uppercase text-slate-400 transition-all">Goles</button>
+                </div>
+                <div id="admin-teams-view" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                <div id="admin-scores-view" class="hidden space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                <button onclick="saveAdminData()" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-bold uppercase text-xs transition-colors">Publicar Cambios Oficiales</button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZilPXy82ISEeuvxNVGbA_uCQs0bYZshE",
+            authDomain: "mundial-2026-964fb.firebaseapp.com",
+            projectId: "mundial-2026-964fb",
+            storageBucket: "mundial-2026-964fb.firebasestorage.app",
+            messagingSenderId: "654587372341",
+            appId: "1:654587372341:web:89daa2fb22da1b173e227c",
+            measurementId: "G-F7VMRE82BE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const APP_ID = 'mundial-2026'; 
+
+        let masterTeams = {};
+        for(let i=1; i<=48; i++) masterTeams[`g${i}`] = `Equipo ${i}`;
+        for(let i=1; i<=64; i++) masterTeams[`k${i}`] = `Cupo ${i}`;
+
+        const MATCH_DEFS = [];
+        let mid = 1;
+        const GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+        GROUP_LETTERS.forEach((letter, gIdx) => {
+            const teamIds = [`g${gIdx*4+1}`, `g${gIdx*4+2}`, `g${gIdx*4+3}`, `g${gIdx*4+4}`];
+            const games = [[0,1], [2,3], [0,2], [1,3], [0,3], [1,2]];
+            games.forEach(idx => MATCH_DEFS.push({ id: mid++, phase: 'groups', title: `Grupo ${letter}`, t1: teamIds[idx[0]], t2: teamIds[idx[1]] }));
+        });
+        for(let i=0; i<16; i++) MATCH_DEFS.push({ id: mid++, phase: 'k32', title: '16vos de Final', t1: `k${i*2+1}`, t2: `k${i*2+2}`, isK: true });
+        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'k16', title: 'Octavos de Final', t1: `k${33+i*2}`, t2: `k${33+i*2+1}`, isK: true });
+        for(let i=0; i<4; i++) MATCH_DEFS.push({ id: mid++, phase: 'k8', title: 'Cuartos de Final', t1: `k${49+i*2}`, t2: `k${49+i*2+1}`, isK: true });
+        for(let i=0; i<2; i++) MATCH_DEFS.push({ id: mid++, phase: 'k4', title: 'Semifinales', t1: `k${57+i*2}`, t2: `k${57+i*2+1}`, isK: true });
+        MATCH_DEFS.push({ id: 103, phase: 'final', title: 'Tercer Puesto', t1: 'k61', t2: 'k62', isK: true });
+        MATCH_DEFS.push({ id: 104, phase: 'final', title: 'GRAN FINAL', t1: 'k63', t2: 'k64', isK: true });
+
+        let currentUserId = null;
+        let myPredictions = {};
+        let realResults = {};
+        let activePhase = 'groups';
+        let participantsData = [];
+        let clickCount = 0;
+
+        window.addEventListener('load', async () => {
+            renderAdminForms();
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                await signInAnonymously(auth);
+            } catch (e) { console.error(e); }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                document.getElementById('status-text').innerText = "ESTADIO CONECTADO";
+                document.getElementById('uid-text').innerText = `ID: ${user.uid.substring(0, 10)}...`;
+                document.getElementById('loading-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+                listenToConfig();
+                listenToMyData();
+                listenToParticipants();
+            }
+        });
+
+        function listenToConfig() {
+            onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.results) realResults = data.results;
+                    if (data.teams) masterTeams = { ...masterTeams, ...data.teams };
+                    renderGroups();
+                    updateParticipantsUI();
+                    applyConfigToAdmin();
+                } else { renderGroups(); }
+            });
+        }
+
+        function renderGroups() {
+            const container = document.getElementById('groups-container');
+            container.innerHTML = '';
+            let lastTitle = '';
+            MATCH_DEFS.filter(m => m.phase === activePhase).forEach(m => {
+                if (m.title !== lastTitle) {
+                    lastTitle = m.title;
+                    const h = document.createElement('div');
+                    h.className = "p-3 bg-slate-800 border-l-4 border-emerald-500 font-black text-[10px] uppercase text-emerald-400 mt-4 shadow-lg";
+                    h.innerText = lastTitle;
+                    container.appendChild(h);
+                }
+                const card = document.createElement('div');
+                card.className = "match-card flex items-center justify-between bg-slate-900/40 p-4 rounded-2xl border border-slate-700 transition-all";
+                card.innerHTML = `
+                    <div class="flex-1 flex justify-end items-center gap-2 text-right">
+                        <span class="font-bold text-[10px] text-slate-200 truncate w-24">${masterTeams[m.t1]}</span>
+                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-10 h-10 text-center bg-slate-900 border border-slate-600 rounded-xl text-sm font-black text-white focus:border-emerald-500 outline-none">
+                    </div>
+                    <div class="px-2 text-slate-600 font-black text-[8px] uppercase">vs</div>
+                    <div class="flex-1 flex justify-start items-center gap-2">
+                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-10 h-10 text-center bg-slate-900 border border-slate-600 rounded-xl text-sm font-black text-white focus:border-emerald-500 outline-none">
+                        <span class="font-bold text-[10px] text-slate-200 truncate w-24">${masterTeams[m.t2]}</span>
+                    </div>`;
+                container.appendChild(card);
+            });
+        }
+
+        window.filterPhase = (p) => {
+            activePhase = p;
+            document.querySelectorAll('[onclick^="filterPhase"]').forEach(b => b.classList.remove('bg-emerald-500', 'text-slate-900'));
+            document.getElementById(`f-${p}`).classList.add('bg-emerald-500', 'text-slate-900');
+            renderGroups();
+        };
+
+        window.updatePredict = (id, side, val) => {
+            if (!myPredictions[id]) myPredictions[id] = {};
+            myPredictions[id][side] = val === "" ? null : parseInt(val);
+            updateCounter();
+        };
+
+        function updateCounter() {
+            const count = Object.values(myPredictions).filter(p => p.home !== null && p.away !== null).length;
+            document.getElementById('counter').innerText = `${count} / 104 LISTOS`;
+        }
+
+        window.saveProde = async () => {
+            const name = document.getElementById('username').value.trim();
+            if (!name) return showNotify("¡Poné tu apodo!", "error");
+            try {
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId), {
+                    username: name, predictions: myPredictions, updatedAt: new Date().toISOString()
+                });
+                showNotify("¡PRODE GUARDADO!", "success");
+            } catch (e) { showNotify("Error al guardar.", "error"); }
+        };
+
+        function renderAdminForms() {
+            const tmView = document.getElementById('admin-teams-view');
+            const scView = document.getElementById('admin-scores-view');
+            let tmHtml = '';
+            GROUP_LETTERS.forEach((l, i) => {
+                tmHtml += `<div class="p-2 bg-slate-800 rounded font-black text-[8px] uppercase text-emerald-500">GRUPO ${l}</div>`;
+                for(let j=1; j<=4; j++) {
+                    const id = `g${i*4+j}`;
+                    tmHtml += `<div class="flex items-center gap-2 bg-slate-900 p-2 rounded">
+                        <span class="text-[8px] text-slate-600 w-4">${id}</span>
+                        <input type="text" id="adm-tm-${id}" placeholder="Equipo" class="bg-transparent text-white text-[10px] outline-none w-full border-b border-slate-700">
+                    </div>`;
+                }
+            });
+            tmHtml += `<div class="p-2 bg-slate-800 rounded font-black text-[8px] uppercase text-emerald-500 mt-4">ELIMINATORIAS (k1-k64)</div>`;
+            for(let i=1; i<=64; i++) {
+                const id = `k${i}`;
+                tmHtml += `<div class="flex items-center gap-2 bg-slate-900 p-1 rounded">
+                    <span class="text-[8px] text-slate-600 w-4">${id}</span>
+                    <input type="text" id="adm-tm-${id}" class="bg-transparent text-white text-[10px] outline-none w-full border-b border-slate-700">
+                </div>`;
+            }
+            tmView.innerHTML = tmHtml;
+            let scHtml = '';
+            MATCH_DEFS.forEach(m => {
+                scHtml += `<div class="flex items-center justify-between bg-slate-800 p-2 rounded-lg border border-slate-700 text-[9px]">
+                    <span class="w-16 truncate uppercase">${m.id}. ${m.title}</span>
+                    <div class="flex gap-1">
+                        <input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-slate-900 text-center rounded border border-slate-600 text-emerald-400 font-bold">
+                        <input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-slate-900 text-center rounded border border-slate-600 text-emerald-400 font-bold">
+                    </div>
+                </div>`;
+            });
+            scView.innerHTML = scHtml;
+        }
+
+        function applyConfigToAdmin() {
+            Object.entries(masterTeams).forEach(([id, name]) => {
+                const el = document.getElementById(`adm-tm-${id}`);
+                if (el) el.value = name;
+            });
+            Object.entries(realResults).forEach(([id, scores]) => {
+                const h = document.getElementById(`adm-h-${id}`);
+                const a = document.getElementById(`adm-a-${id}`);
+                if (h) h.value = scores.home;
+                if (a) a.value = scores.away;
+            });
+        }
+
+        window.saveAdminData = async () => {
+            const results = {}; const teams = {};
+            MATCH_DEFS.forEach(m => {
+                const h = document.getElementById(`adm-h-${m.id}`).value;
+                const a = document.getElementById(`adm-a-${m.id}`).value;
+                if(h !== "" && a !== "") results[m.id] = { home: parseInt(h), away: parseInt(a) };
+            });
+            Object.keys(masterTeams).forEach(id => {
+                const el = document.getElementById(`adm-tm-${id}`);
+                if (el) teams[id] = el.value;
+            });
+            try {
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, updatedAt: new Date().toISOString() });
+                showNotify("MUNDIAL ACTUALIZADO", "success");
+            } catch (e) { showNotify("Error admin.", "error"); }
+        };
+
+        window.copyLink = () => {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            showNotify("LINK COPIADO. ¡Mandalo por WhatsApp!", "success");
+        };
+
+        window.adminClick = () => {
+            clickCount++;
+            if (clickCount >= 5) {
+                document.getElementById('admin-panel').classList.toggle('hidden');
+                document.getElementById('admin-hint').style.opacity = '1';
+                clickCount = 0;
+            }
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active', 'text-white'));
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('tab-active', 'text-white');
+        };
+
+        window.switchAdminTab = (t) => {
+            document.getElementById('admin-scores-view').classList.toggle('hidden', t !== 'scores');
+            document.getElementById('admin-teams-view').classList.toggle('hidden', t !== 'teams');
+            document.getElementById('tab-adm-teams').className = t === 'teams' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-emerald-500 text-slate-900 rounded-lg" : "flex-1 py-1 text-[8px] font-bold uppercase text-slate-400";
+            document.getElementById('tab-adm-scores').className = t === 'scores' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-emerald-500 text-slate-900 rounded-lg" : "flex-1 py-1 text-[8px] font-bold uppercase text-slate-400";
+        };
+
+        function calculatePoints(preds, reals) {
+            let total = 0;
+            Object.entries(reals).forEach(([id, real]) => {
+                const pred = preds[id];
+                if (!pred || pred.home === null || pred.away === null) return;
+                if (pred.home === real.home && pred.away === real.away) total += 3;
+                else {
+                    const rR = real.home > real.away ? 1 : (real.home < real.away ? 2 : 0);
+                    const pR = pred.home > pred.away ? 1 : (pred.home < pred.away ? 2 : 0);
+                    if (rR === pR) total += 1;
+                }
+            });
+            return total;
+        }
+
+        function updateParticipantsUI() {
+            const list = document.getElementById('participants-list');
+            const sorted = participantsData.map(p => ({ ...p, points: calculatePoints(p.predictions || {}, realResults) })).sort((a, b) => b.points - a.points);
+            list.innerHTML = '';
+            sorted.forEach((p, idx) => {
+                const item = document.createElement('div');
+                item.className = `flex justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-700 ${p.id === currentUserId ? 'border-emerald-500 ring-1 ring-emerald-500' : ''}`;
+                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-white italic uppercase">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-slate-600 font-bold">ID: ${p.id.substring(0, 6)}</span></div><div class="bg-emerald-500 text-slate-900 px-4 py-1.5 rounded-full text-xs font-black shadow-lg">${p.points} PTS</div>`;
+                list.appendChild(item);
+            });
+        }
+
+        function listenToMyData() {
+            onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (data.username) document.getElementById('username').value = data.username;
+                    myPredictions = data.predictions || {};
+                    updateCounter(); renderGroups();
+                }
+            });
+        }
+
+        function listenToParticipants() {
+            onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'predictions'), (snap) => {
+                participantsData = [];
+                snap.forEach(d => participantsData.push({ id: d.id, ...d.data() }));
+                updateParticipantsUI();
+            });
+        }
+
+        function showNotify(msg, type) {
+            const div = document.getElementById('notification');
+            div.innerText = msg;
+            div.className = `fixed bottom-4 left-4 right-4 z-[60] p-4 rounded-xl border-2 flex items-center justify-center gap-3 shadow-2xl animate-bounce ${type === 'error' ? 'bg-red-500/20 border-red-500 text-red-200' : 'bg-emerald-500/20 border-emerald-500 text-emerald-200'}`;
+            div.classList.remove('hidden');
+            setTimeout(() => div.classList.add('hidden'), 4000);
+        }
+    </script>
+</body>
+</html>
