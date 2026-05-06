@@ -130,6 +130,8 @@
                 <button onclick="filterPhase('groups')" id="f-groups" class="px-5 py-2 rounded-full tab-active font-bold text-[10px] uppercase border-2 border-bissio-sand font-quest">Grupos</button>
                 <button onclick="filterPhase('k32')" id="f-k32" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">16vos</button>
                 <button onclick="filterPhase('k16')" id="f-k16" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Octavos</button>
+                <button onclick="filterPhase('k8')" id="f-k8" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Cuartos</button>
+                <button onclick="filterPhase('k4')" id="f-k4" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Semis</button>
                 <button onclick="filterPhase('final')" id="f-final" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Finales</button>
             </div>
 
@@ -220,9 +222,12 @@
             const teamIds = [`g${gIdx*4+1}`, `g${gIdx*4+2}`, `g${gIdx*4+3}`, `g${gIdx*4+4}`];
             [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]].forEach(idx => MATCH_DEFS.push({ id: mid++, phase: 'groups', title: `Grupo ${letter}`, t1: teamIds[idx[0]], t2: teamIds[idx[1]] }));
         });
-        for(let i=0; i<16; i++) MATCH_DEFS.push({ id: mid++, phase: 'k32', title: '16vos', t1: `k${i*2+1}`, t2: `k${i*2+2}`, isK: true });
-        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'k16', title: 'Octavos', t1: `k${33+i*2}`, t2: `k${33+i*2+1}`, isK: true });
-        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'final', title: 'Fases Finales', t1: `k${49+i*2}`, t2: `k${49+i*2+1}`, isK: true });
+        for(let i=0; i<16; i++) MATCH_DEFS.push({ id: mid++, phase: 'k32', title: '16vos de Final', t1: `k${i*2+1}`, t2: `k${i*2+2}`, isK: true });
+        for(let i=0; i<8; i++) MATCH_DEFS.push({ id: mid++, phase: 'k16', title: 'Octavos de Final', t1: `k${33+i*2}`, t2: `k${33+i*2+1}`, isK: true });
+        for(let i=0; i<4; i++) MATCH_DEFS.push({ id: mid++, phase: 'k8', title: 'Cuartos de Final', t1: `k${49+i*2}`, t2: `k${49+i*2+1}`, isK: true });
+        for(let i=0; i<2; i++) MATCH_DEFS.push({ id: mid++, phase: 'k4', title: 'Semifinales', t1: `k${57+i*2}`, t2: `k${57+i*2+1}`, isK: true });
+        MATCH_DEFS.push({ id: 103, phase: 'final', title: 'Tercer Puesto', t1: 'k61', t2: 'k62', isK: true });
+        MATCH_DEFS.push({ id: 104, phase: 'final', title: 'Gran Final', t1: 'k63', t2: 'k64', isK: true });
 
         let currentUserId = null;
         let myPredictions = {};
@@ -231,6 +236,7 @@
         let participantsData = [];
         let authenticatedEmail = '';
         let clickCount = 0;
+        let lockedMatches = {};
 
         // Ocultar pantalla de carga a la fuerza si tarda mucho (Fallback)
         setTimeout(() => {
@@ -268,6 +274,7 @@
                     const data = snap.data();
                     if (data.results) realResults = data.results;
                     if (data.teams) masterTeams = { ...masterTeams, ...data.teams };
+                    if (data.lockedMatches) lockedMatches = data.lockedMatches;
                     renderGroups();
                     updateParticipantsUI();
                     applyConfigToAdmin();
@@ -294,6 +301,24 @@
             }
         };
 
+        function updateLockUI() {
+            const btnSave = document.getElementById('btn-save');
+            const banner = document.getElementById('lock-banner');
+            if (isProdeLocked) {
+                btnSave.disabled = true;
+                btnSave.innerHTML = `<span class="font-quest">🔒 EL PRODE ESTÁ CERRADO</span>`;
+                btnSave.classList.add('opacity-50', 'cursor-not-allowed');
+                btnSave.classList.remove('hover:brightness-110');
+                if(banner) banner.classList.remove('hidden');
+            } else {
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> <span>Guardar mi Pronóstico</span>`;
+                btnSave.classList.remove('opacity-50', 'cursor-not-allowed');
+                btnSave.classList.add('hover:brightness-110');
+                if(banner) banner.classList.add('hidden');
+            }
+        }
+
         function renderGroups() {
             const container = document.getElementById('groups-container');
             container.innerHTML = '';
@@ -306,16 +331,22 @@
                     h.innerText = lastTitle;
                     container.appendChild(h);
                 }
+                
+                const isMatchLocked = lockedMatches[m.id] === true;
+                const disabledAttr = isMatchLocked ? 'disabled' : '';
+                const opacityClass = isMatchLocked ? 'opacity-50 cursor-not-allowed' : '';
+                const lockIcon = isMatchLocked ? '🔒' : 'vs';
+
                 const card = document.createElement('div');
                 card.className = "match-card flex items-center justify-between bg-bissio-petrol/20 p-4 rounded-2xl border border-bissio-petrol/50 transition-all";
                 card.innerHTML = `
                     <div class="flex-1 flex justify-end items-center gap-2 text-right">
                         <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase tracking-tight">${masterTeams[m.t1] || m.t1}</span>
-                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none">
+                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none ${opacityClass}" ${disabledAttr}>
                     </div>
-                    <div class="px-2 text-bissio-sand/50 font-black text-[8px] uppercase text-center font-quest">vs</div>
+                    <div class="px-2 text-bissio-sand/50 font-black text-[10px] uppercase text-center font-quest">${lockIcon}</div>
                     <div class="flex-1 flex justify-start items-center gap-2">
-                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none">
+                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none ${opacityClass}" ${disabledAttr}>
                         <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase tracking-tight">${masterTeams[m.t2] || m.t2}</span>
                     </div>`;
                 container.appendChild(card);
@@ -366,7 +397,7 @@
             tmView.innerHTML = tmHtml;
             let scHtml = '';
             MATCH_DEFS.forEach(m => {
-                scHtml += `<div class="flex items-center justify-between bg-bissio-petrol p-2 rounded-lg border border-bissio-petrol/50 text-[9px]"><span class="w-16 truncate uppercase text-bissio-sand">${m.id}. ${m.title}</span><div class="flex gap-1"><input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"><input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"></div></div>`;
+                scHtml += `<div class="flex items-center justify-between bg-bissio-petrol p-2 rounded-lg border border-bissio-petrol/50 text-[9px]"><div class="flex items-center gap-2 w-24"><input type="checkbox" id="adm-lock-${m.id}" class="accent-bissio-clay cursor-pointer w-3 h-3" title="Bloquear Partido"><span class="truncate uppercase text-bissio-sand">${m.id}. ${m.title}</span></div><div class="flex gap-1"><input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"><input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"></div></div>`;
             });
             scView.innerHTML = scHtml;
         }
@@ -382,21 +413,32 @@
                 if (h) h.value = scores.home;
                 if (a) a.value = scores.away;
             });
+            Object.entries(lockedMatches).forEach(([id, isLocked]) => {
+                const lockCheck = document.getElementById(`adm-lock-${id}`);
+                if (lockCheck) lockCheck.checked = isLocked;
+            });
         }
 
         window.saveAdminData = async () => {
-            const results = {}; const teams = {};
+            if (authenticatedEmail.toLowerCase() !== 'lara.bissio@estudiobissio.com.ar') {
+                return showNotify("ACCESO DENEGADO. No tenés permisos de administrador.", "error");
+            }
+
+            const results = {}; const teams = {}; const newLockedMatches = {};
             MATCH_DEFS.forEach(m => {
                 const h = document.getElementById(`adm-h-${m.id}`).value;
                 const a = document.getElementById(`adm-a-${m.id}`).value;
                 if(h !== "" && a !== "") results[m.id] = { home: parseInt(h), away: parseInt(a) };
+
+                const lockEl = document.getElementById(`adm-lock-${m.id}`);
+                if (lockEl) newLockedMatches[m.id] = lockEl.checked;
             });
             Object.keys(masterTeams).forEach(id => {
                 const el = document.getElementById(`adm-tm-${id}`);
                 if (el) teams[id] = el.value;
             });
             try {
-                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, updatedAt: new Date().toISOString() });
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, lockedMatches: newLockedMatches, updatedAt: new Date().toISOString() });
                 showNotify("ACTUALIZADO", "success");
             } catch (e) { showNotify("Error admin.", "error"); }
         };
@@ -404,8 +446,12 @@
         window.adminClick = () => {
             clickCount++;
             if (clickCount >= 5) {
-                document.getElementById('admin-panel').classList.toggle('hidden');
-                showNotify("MESA DE CONTROL ABIERTA", "success");
+                if (authenticatedEmail.toLowerCase() === 'lara.bissio@estudiobissio.com.ar') {
+                    document.getElementById('admin-panel').classList.toggle('hidden');
+                    showNotify("MESA DE CONTROL ABIERTA", "success");
+                } else {
+                    showNotify("ACCESO DENEGADO. Solo Lara puede abrir este panel.", "error");
+                }
                 clickCount = 0;
             }
         };
