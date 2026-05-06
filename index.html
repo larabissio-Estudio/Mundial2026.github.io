@@ -3,117 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Prode Mundial 2026 - El Maestro</title>
+    <title>Prode Mundial 2026 - Estudio Bissio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bissio: {
+                            petrol: 'rgb(38, 78, 79)',
+                            sand: 'rgb(216, 203, 169)',
+                            forest: 'rgb(56, 65, 47)',
+                            clay: 'rgb(198, 134, 106)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        quest: ['Questrial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .tab-active { @apply bg-emerald-500 text-white shadow-lg scale-105; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .match-card:focus-within { @apply border-emerald-500 ring-1 ring-emerald-500; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Questrial&display=swap');
+        
+        /* Estilos Base obligatorios */
+        html, body { 
+            background-color: rgb(56, 65, 47) !important; 
+            color: rgb(216, 203, 169);
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-quest { font-family: 'Questrial', sans-serif; }
+
+        /* Botones y Pestañas en Color Arena */
+        .tab-active { 
+            background-color: rgb(216, 203, 169) !important; 
+            color: rgb(56, 65, 47) !important; 
+            font-weight: 900; 
+        }
+
+        .match-card:focus-within { 
+            border-color: rgb(216, 203, 169); 
+            box-shadow: 0 0 0 1px rgb(216, 203, 169);
+        }
+
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
-        .phase-btn-active { @apply bg-emerald-500 text-slate-900 border-emerald-500; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: rgb(216, 203, 169); 
+            border-radius: 10px; 
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen pb-12 overflow-x-hidden text-center sm:text-left">
+<body class="min-h-screen pb-12 overflow-x-hidden text-center sm:text-left bg-bissio-forest font-sans">
 
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-900 z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-emerald-500 font-black uppercase italic tracking-widest animate-pulse">Abriendo el Estadio...</p>
+    <!-- PANTALLA DE ACCESO POR WHITELIST -->
+    <div id="lock-screen" class="fixed inset-0 bg-bissio-forest z-[200] flex flex-col items-center justify-center p-6 transition-all duration-500">
+        <div class="max-w-md w-full bg-bissio-petrol p-8 rounded-3xl border-2 border-bissio-sand/20 shadow-2xl text-center">
+            <div class="bg-bissio-sand/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-bissio-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-black uppercase italic text-bissio-sand mb-2 tracking-tighter font-quest">Estudio Bissio</h2>
+            <p class="text-bissio-sand/70 text-[10px] mb-6 uppercase font-bold tracking-[0.2em] font-quest">Identificación Corporativa</p>
+            
+            <div class="space-y-4 text-left font-quest">
+                <div>
+                    <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Email del Estudio</label>
+                    <input type="email" id="access-email" placeholder="usuario@estudiobissio.com.ar" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-bissio-sand outline-none focus:border-bissio-sand transition-all text-sm font-bold shadow-inner">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Código de Invitación</label>
+                    <input type="text" id="access-code" placeholder="CÓDIGO" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-center text-lg font-black tracking-widest text-bissio-sand outline-none focus:border-bissio-sand uppercase shadow-inner">
+                </div>
+            </div>
+
+            <button onclick="checkWhitelistAccess()" class="w-full bg-bissio-sand hover:brightness-110 text-bissio-forest font-black py-4 rounded-2xl mt-6 transition-all uppercase tracking-widest shadow-xl font-quest">Entrar a la Cancha</button>
+            <p id="access-error" class="text-red-400 text-[10px] mt-4 font-bold hidden uppercase font-quest">Email no autorizado o código incorrecto.</p>
+        </div>
     </div>
 
-    <header class="bg-emerald-600 shadow-xl p-4 sticky top-0 z-50 border-b-4 border-emerald-500">
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading-overlay" class="fixed inset-0 bg-bissio-forest z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="w-16 h-16 border-4 border-bissio-sand border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-bissio-sand font-black uppercase italic tracking-widest animate-pulse font-quest">Estudio Bissio - Prode 2026</p>
+    </div>
+
+    <header class="bg-bissio-petrol shadow-xl p-4 sticky top-0 z-50 border-b-4 border-bissio-petrol/30">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l9 5-9 5-9-5 9 5z"></path></svg>
-                <h1 class="text-xl font-black uppercase italic tracking-tighter text-white">Prode 2026</h1>
+                <svg class="w-6 h-6 text-bissio-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l9 5-9 5-9-5 9 5z"></path></svg>
+                <h1 class="text-xl font-black uppercase italic tracking-tighter text-bissio-sand font-quest">Prode Bissio 2026</h1>
             </div>
-            <div id="counter" class="text-[10px] font-bold bg-emerald-800 px-3 py-1.5 rounded-full border border-emerald-500 text-yellow-300 shadow-inner">
+            <div id="counter" class="text-[10px] font-bold bg-bissio-forest px-3 py-1.5 rounded-full border border-bissio-sand/20 text-bissio-sand shadow-inner font-quest">
                 0 / 104 LISTOS
             </div>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto mt-4 px-4">
-        <div id="conn-status" class="mb-4 text-[9px] text-slate-500 uppercase flex justify-between px-2 font-bold">
+        <div id="conn-status" class="mb-4 text-[9px] text-bissio-sand/40 uppercase flex justify-between px-2 font-bold tracking-widest font-quest">
             <span id="status-text">Conectando...</span>
             <span id="uid-text">ID: ---</span>
         </div>
 
-        <nav class="flex bg-slate-800 rounded-xl p-1 shadow-2xl gap-1 mb-6">
-            <button onclick="switchTab('jugar')" id="btn-jugar" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest tab-active text-white">Jugar</button>
-            <button onclick="switchTab('la-banda')" id="btn-la-banda" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-slate-400">Posiciones</button>
-            <button onclick="switchTab('reglas')" id="btn-reglas" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-slate-400">Reglas</button>
+        <nav class="flex bg-bissio-petrol rounded-xl p-1 shadow-2xl gap-1 mb-6">
+            <button onclick="switchTab('jugar')" id="btn-jugar" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest tab-active text-bissio-forest font-quest">Jugar</button>
+            <button onclick="switchTab('la-banda')" id="btn-la-banda" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-bissio-sand/50 font-quest">Posiciones</button>
+            <button onclick="switchTab('reglas')" id="btn-reglas" class="flex-1 py-2.5 rounded-lg font-bold transition-all uppercase text-[10px] tracking-widest text-bissio-sand/50 font-quest">Reglas</button>
         </nav>
 
-        <div id="notification" class="hidden fixed bottom-4 left-4 right-4 z-[60] p-4 rounded-xl border-2 flex items-center justify-center gap-3 shadow-2xl animate-bounce text-center font-bold"></div>
+        <div id="notification" class="hidden fixed bottom-4 left-4 right-4 z-[60] p-4 rounded-xl border-2 flex items-center justify-center gap-3 shadow-2xl animate-bounce text-center font-bold font-quest text-xs"></div>
 
         <section id="sec-jugar" class="space-y-6 text-left">
-            <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl flex flex-col sm:flex-row gap-4 items-end">
-                <div class="flex-1 w-full">
-                    <label class="block text-emerald-400 font-bold mb-2 uppercase text-[10px] tracking-widest">Tu Identidad</label>
-                    <input type="text" id="username" placeholder="Ej: Messi10" class="w-full bg-slate-900 border-2 border-slate-700 rounded-xl p-3 text-white focus:border-emerald-500 outline-none transition-all text-lg font-bold shadow-inner">
-                </div>
-                <button onclick="copyLink()" class="bg-slate-700 hover:bg-slate-600 text-slate-300 p-3 rounded-xl transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-slate-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                    Invitar Amigos
-                </button>
+            <div class="bg-bissio-petrol p-5 rounded-2xl border border-bissio-petrol/50 shadow-xl">
+                <label class="block text-bissio-sand font-bold mb-2 uppercase text-[10px] tracking-widest font-quest">Tu Nombre para el Ranking</label>
+                <input type="text" id="username" placeholder="Ej: Juan Pérez" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-bissio-sand focus:border-bissio-sand outline-none transition-all text-lg font-bold shadow-inner">
+                <p id="user-email-display" class="text-[9px] text-bissio-sand/30 mt-2 italic font-bold uppercase tracking-widest"></p>
             </div>
 
             <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="filterPhase('groups')" id="f-groups" class="px-4 py-2 rounded-full bg-emerald-500 text-slate-900 font-bold text-[10px] uppercase border-2 border-emerald-500">Grupos</button>
-                <button onclick="filterPhase('k32')" id="f-k32" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">16vos</button>
-                <button onclick="filterPhase('k16')" id="f-k16" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">Octavos</button>
-                <button onclick="filterPhase('k8')" id="f-k8" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">Cuartos</button>
-                <button onclick="filterPhase('final')" id="f-final" class="px-4 py-2 rounded-full bg-slate-800 text-slate-400 font-bold text-[10px] uppercase border-2 border-slate-700">Finales</button>
+                <button onclick="filterPhase('groups')" id="f-groups" class="px-5 py-2 rounded-full bg-bissio-sand text-bissio-forest font-bold text-[10px] uppercase border-2 border-bissio-sand font-quest">Grupos</button>
+                <button onclick="filterPhase('k32')" id="f-k32" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">16vos</button>
+                <button onclick="filterPhase('k16')" id="f-k16" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Octavos</button>
+                <button onclick="filterPhase('final')" id="f-final" class="px-5 py-2 rounded-full bg-bissio-petrol text-bissio-sand/50 font-bold text-[10px] uppercase border-2 border-bissio-petrol/50 font-quest">Finales</button>
             </div>
 
             <div id="groups-container" class="space-y-4"></div>
 
             <div class="mt-8 flex justify-center pb-12">
-                <button onclick="saveProde()" id="btn-save" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black py-4 rounded-2xl flex items-center justify-center gap-3 shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm">
+                <button onclick="saveProde()" id="btn-save" class="w-full bg-bissio-sand hover:brightness-110 text-bissio-forest font-black py-4 rounded-2xl flex items-center justify-center gap-3 shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm font-quest">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    <span>Guardar mi Prode</span>
+                    <span>Guardar mi Pronóstico</span>
                 </button>
             </div>
         </section>
 
-        <section id="sec-la-banda" class="hidden bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-2xl">
-            <h2 class="text-xl font-black mb-6 flex items-center gap-3 uppercase italic text-white justify-center sm:justify-start">
-                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Ranking General
+        <section id="sec-la-banda" class="hidden bg-bissio-petrol p-6 rounded-3xl border border-bissio-petrol/50 shadow-2xl">
+            <h2 class="text-xl font-black mb-6 flex items-center gap-3 uppercase italic text-bissio-sand justify-center sm:justify-start font-quest">
+                <svg class="w-6 h-6 text-bissio-sand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Ranking del Estudio
             </h2>
             <div id="participants-list" class="grid gap-3"></div>
         </section>
 
-        <section id="sec-reglas" class="hidden bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl text-left">
+        <section id="sec-reglas" class="hidden bg-bissio-petrol p-8 rounded-3xl border border-bissio-petrol/50 shadow-2xl text-left">
             <div class="flex justify-between items-center mb-6">
-                <h2 id="rules-title" onclick="adminClick()" class="text-3xl font-black italic text-emerald-400 uppercase tracking-tighter cursor-pointer select-none">Reglas</h2>
-                <span id="admin-hint" class="text-[8px] text-emerald-500 font-bold uppercase tracking-widest opacity-0">Modo Maestro</span>
+                <h2 id="rules-title" onclick="adminClick()" class="text-3xl font-black italic text-bissio-sand uppercase tracking-tighter cursor-pointer select-none font-quest">Reglas</h2>
+                <span id="admin-hint" class="text-[8px] text-bissio-sand/50 font-bold uppercase tracking-widest opacity-0 font-quest">Modo Maestro Activado</span>
             </div>
             <div class="space-y-6">
                 <div class="flex gap-4 items-start">
-                    <div class="bg-emerald-500 text-slate-900 font-black px-4 py-2 rounded-xl text-2xl h-fit">3</div>
-                    <div><h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Pleno</h3><p class="text-slate-400 text-sm">Goles exactos de ambos.</p></div>
+                    <div class="bg-bissio-sand text-bissio-forest font-black px-4 py-2 rounded-xl text-2xl h-fit shadow-md font-quest">3</div>
+                    <div><h3 class="text-lg font-black text-bissio-sand uppercase italic tracking-tighter font-quest">Pleno</h3><p class="text-bissio-sand/60 text-sm">Goles exactos de ambos equipos.</p></div>
                 </div>
-                <div class="flex gap-4 border-t border-slate-700 pt-6 items-start">
-                    <div class="bg-blue-500 text-slate-900 font-black px-4 py-2 rounded-xl text-2xl h-fit">1</div>
-                    <div><h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Tendencia</h3><p class="text-slate-400 text-sm">Acertás quién gana o empate.</p></div>
+                <div class="flex gap-4 border-t border-bissio-forest pt-6 items-start">
+                    <div class="bg-bissio-sand/20 text-bissio-sand font-black px-4 py-2 rounded-xl text-2xl h-fit shadow-md font-quest">1</div>
+                    <div><h3 class="text-lg font-black text-bissio-sand uppercase italic tracking-tighter font-quest">Tendencia</h3><p class="text-bissio-sand/60 text-sm">Acertás quién gana o empate.</p></div>
                 </div>
             </div>
 
-            <div id="admin-panel" class="hidden mt-10 p-6 bg-slate-900 rounded-2xl border-2 border-emerald-500 shadow-2xl">
-                <h3 class="text-emerald-400 font-black uppercase italic mb-4 text-center">Mesa de Control</h3>
-                <div class="flex bg-slate-800 p-1 rounded-xl mb-4 gap-1">
-                    <button onclick="switchAdminTab('teams')" id="tab-adm-teams" class="flex-1 py-1 text-[8px] font-bold uppercase bg-emerald-500 text-slate-900 rounded-lg transition-all">Equipos</button>
-                    <button onclick="switchAdminTab('scores')" id="tab-adm-scores" class="flex-1 py-1 text-[8px] font-bold uppercase text-slate-400 transition-all">Goles</button>
+            <!-- PANEL ADMIN -->
+            <div id="admin-panel" class="hidden mt-10 p-6 bg-bissio-forest rounded-2xl border-2 border-bissio-sand/20 shadow-2xl">
+                <h3 class="text-bissio-sand font-black uppercase italic mb-4 text-center font-quest">Mesa de Control</h3>
+                <div class="flex bg-bissio-petrol p-1 rounded-xl mb-4 gap-1">
+                    <button onclick="switchAdminTab('teams')" id="tab-adm-teams" class="flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest">Equipos</button>
+                    <button onclick="switchAdminTab('scores')" id="tab-adm-scores" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest">Goles</button>
+                    <button onclick="switchAdminTab('security')" id="tab-adm-security" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest">Acceso</button>
                 </div>
                 <div id="admin-teams-view" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
-                <div id="admin-scores-view" class="hidden space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
-                <button onclick="saveAdminData()" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-500 py-3 rounded-xl font-bold uppercase text-xs transition-colors">Publicar Cambios Oficiales</button>
+                <div id="admin-scores-view" class="hidden space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar text-bissio-sand"></div>
+                <div id="admin-security-view" class="hidden p-4 bg-bissio-petrol rounded-xl space-y-4">
+                    <label class="block text-bissio-sand font-bold uppercase text-[10px] font-quest">Código Maestro de Invitación</label>
+                    <input type="text" id="adm-security-code" class="w-full bg-bissio-forest border border-bissio-sand/20 rounded p-2 text-bissio-sand font-bold outline-none font-quest" placeholder="Escribí el código aquí">
+                </div>
+                <button onclick="saveAdminData()" class="mt-6 w-full bg-bissio-sand hover:brightness-110 text-bissio-forest font-black py-3 rounded-xl font-bold uppercase text-xs font-quest">Publicar Cambios Oficiales</button>
             </div>
         </section>
     </main>
@@ -122,6 +194,25 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // --- WHITELIST DE EMPLEADOS AUTORIZADOS ---
+        const ALLOWED_EMAILS = [
+            'maestro@prode.com',
+            'lmartins@estudiobissio.com.ar', 'imartins@estudiobissio.com.ar', 'sprandi@estudiobissio.com.ar',
+            'panria@estudiobissio.com.ar', 'nr.artech@gmail.com', 'elizabeth.perez@geatech.ar',
+            'rfernandez@estudiobissio.com.ar', 'bdieguez@estudiobissio.com.ar', 'mrojas@estudiobissio.com.ar',
+            'ndussich@estudiobissio.com.ar', 'laguirre@estudiobissio.com.ar', 'ecabana@estudiobissio.com.ar',
+            'atoledo@estudiobissio.com.ar', 'mabalos@estudiobissio.com.ar', 'fdimartino@estudiobissio.com.ar',
+            'dlares@estudiobissio.com.ar', 'mdasilva@estudiobissio.com.ar', 'afarias@estudiobissio.com.ar',
+            'cblanco@estudiobissio.com.ar', 'aassmann@estudiobissio.com.ar', 'agirasole@estudiobissio.com.ar',
+            'cmamchur@estudiobissio.com.ar', 'dmonteleone@estudiobissio.com.ar', 'mgonzalez@estudiobissio.com.ar',
+            'spilaria@estudiobissio.com.ar', 'mreyes@estudiobissio.com.ar', 'jpallotta@estudiobissio.com.ar',
+            'icastillo@estudiobissio.com.ar', 'cgarro@estudiobissio.com.ar', 'dtabuchini@estudiobissio.com.ar',
+            'tavalos@estudiobissio.com.ar', 'mercolano@estudiobissio.com.ar', 'klopez@estudiobissio.com.ar',
+            'citurri@estudiobissio.com.ar', 'tlarrosa@estudiobissio.com.ar', 'dsaucedo@estudiobissio.com.ar',
+            'eluna@estudiobissio.com.ar', 'lara.bissio@estudiobissio.com.ar', 'tjuynevich@estudiobissio.com.ar', 'jhbissio@estudiobissio.com.ar',
+            'hdbissio@estudiobissio.com.ar', 'labissio@estudiobissio.com.ar', 'rafael.lopez.jordan@gmail.com'
+        ];
 
         const firebaseConfig = {
             apiKey: "AIzaSyBZilPXy82ISEeuvxNVGbA_uCQs0bYZshE",
@@ -163,6 +254,8 @@
         let activePhase = 'groups';
         let participantsData = [];
         let clickCount = 0;
+        let requiredAccessCode = '';
+        let authenticatedEmail = '';
 
         window.addEventListener('load', async () => {
             renderAdminForms();
@@ -176,7 +269,7 @@
             if (user) {
                 currentUserId = user.uid;
                 document.getElementById('status-text').innerText = "ESTADIO CONECTADO";
-                document.getElementById('uid-text').innerText = `ID: ${user.uid.substring(0, 10)}...`;
+                document.getElementById('uid-text').innerText = `ID: ${user.uid.substring(0, 8)}...`;
                 document.getElementById('loading-overlay').style.opacity = '0';
                 setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
                 listenToConfig();
@@ -191,12 +284,31 @@
                     const data = snap.data();
                     if (data.results) realResults = data.results;
                     if (data.teams) masterTeams = { ...masterTeams, ...data.teams };
+                    if (data.accessCode) requiredAccessCode = data.accessCode;
+                    checkWhitelistAccess(true);
                     renderGroups();
                     updateParticipantsUI();
                     applyConfigToAdmin();
                 } else { renderGroups(); }
             });
         }
+
+        window.checkWhitelistAccess = (isAuto = false) => {
+            const email = isAuto ? localStorage.getItem('prode_email') : document.getElementById('access-email').value.trim().toLowerCase();
+            const code = isAuto ? localStorage.getItem('prode_access') : document.getElementById('access-code').value.trim().toUpperCase();
+            if (!email || !code) return;
+            const isEmailAllowed = ALLOWED_EMAILS.some(e => e.toLowerCase() === email);
+            const isCodeCorrect = code === requiredAccessCode;
+            if (isEmailAllowed && isCodeCorrect) {
+                authenticatedEmail = email;
+                localStorage.setItem('prode_email', email);
+                localStorage.setItem('prode_access', code);
+                document.getElementById('lock-screen').classList.add('hidden');
+                document.getElementById('user-email-display').innerText = `AUTORIZADO: ${email}`;
+            } else if (!isAuto) {
+                document.getElementById('access-error').classList.remove('hidden');
+            }
+        };
 
         function renderGroups() {
             const container = document.getElementById('groups-container');
@@ -206,21 +318,21 @@
                 if (m.title !== lastTitle) {
                     lastTitle = m.title;
                     const h = document.createElement('div');
-                    h.className = "p-3 bg-slate-800 border-l-4 border-emerald-500 font-black text-[10px] uppercase text-emerald-400 mt-4 shadow-lg";
+                    h.className = "p-3 bg-bissio-petrol border-l-4 border-bissio-sand font-black text-[10px] uppercase text-bissio-sand mt-4 shadow-lg font-quest tracking-widest";
                     h.innerText = lastTitle;
                     container.appendChild(h);
                 }
                 const card = document.createElement('div');
-                card.className = "match-card flex items-center justify-between bg-slate-900/40 p-4 rounded-2xl border border-slate-700 transition-all";
+                card.className = "match-card flex items-center justify-between bg-bissio-petrol/20 p-4 rounded-2xl border border-bissio-petrol/50 transition-all";
                 card.innerHTML = `
                     <div class="flex-1 flex justify-end items-center gap-2 text-right">
-                        <span class="font-bold text-[10px] text-slate-200 truncate w-24">${masterTeams[m.t1]}</span>
-                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-10 h-10 text-center bg-slate-900 border border-slate-600 rounded-xl text-sm font-black text-white focus:border-emerald-500 outline-none">
+                        <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase">${masterTeams[m.t1]}</span>
+                        <input type="number" value="${myPredictions[m.id]?.home ?? ''}" oninput="updatePredict(${m.id}, 'home', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none focus:border-bissio-sand transition-all">
                     </div>
-                    <div class="px-2 text-slate-600 font-black text-[8px] uppercase">vs</div>
+                    <div class="px-2 text-bissio-sand/50 font-black text-[8px] uppercase text-center font-quest">vs</div>
                     <div class="flex-1 flex justify-start items-center gap-2">
-                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-10 h-10 text-center bg-slate-900 border border-slate-600 rounded-xl text-sm font-black text-white focus:border-emerald-500 outline-none">
-                        <span class="font-bold text-[10px] text-slate-200 truncate w-24">${masterTeams[m.t2]}</span>
+                        <input type="number" value="${myPredictions[m.id]?.away ?? ''}" oninput="updatePredict(${m.id}, 'away', this.value)" class="w-11 h-11 text-center bg-bissio-forest border-2 border-bissio-sand/20 rounded-xl text-lg font-black text-bissio-sand outline-none focus:border-bissio-sand transition-all">
+                        <span class="font-bold text-[10px] text-bissio-sand truncate w-24 uppercase tracking-tight">${masterTeams[m.t2]}</span>
                     </div>`;
                 container.appendChild(card);
             });
@@ -228,8 +340,13 @@
 
         window.filterPhase = (p) => {
             activePhase = p;
-            document.querySelectorAll('[onclick^="filterPhase"]').forEach(b => b.classList.remove('bg-emerald-500', 'text-slate-900'));
-            document.getElementById(`f-${p}`).classList.add('bg-emerald-500', 'text-slate-900');
+            document.querySelectorAll('[onclick^="filterPhase"]').forEach(b => {
+                b.classList.remove('bg-bissio-sand', 'text-bissio-forest', 'shadow-lg');
+                b.classList.add('bg-bissio-petrol', 'text-bissio-sand/50');
+            });
+            const btn = document.getElementById(`f-${p}`);
+            btn.classList.add('bg-bissio-sand', 'text-bissio-forest', 'shadow-lg');
+            btn.classList.remove('bg-bissio-petrol', 'text-bissio-sand/50');
             renderGroups();
         };
 
@@ -246,12 +363,13 @@
 
         window.saveProde = async () => {
             const name = document.getElementById('username').value.trim();
-            if (!name) return showNotify("¡Poné tu apodo!", "error");
+            if (!name) return showNotify("¡Poné tu nombre!", "error");
+            if (!authenticatedEmail) return showNotify("Sesión no válida.", "error");
             try {
                 await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId), {
-                    username: name, predictions: myPredictions, updatedAt: new Date().toISOString()
+                    username: name, email: authenticatedEmail, predictions: myPredictions, updatedAt: new Date().toISOString()
                 });
-                showNotify("¡PRODE GUARDADO!", "success");
+                showNotify("¡PRONÓSTICOS GUARDADOS!", "success");
             } catch (e) { showNotify("Error al guardar.", "error"); }
         };
 
@@ -260,33 +378,16 @@
             const scView = document.getElementById('admin-scores-view');
             let tmHtml = '';
             GROUP_LETTERS.forEach((l, i) => {
-                tmHtml += `<div class="p-2 bg-slate-800 rounded font-black text-[8px] uppercase text-emerald-500">GRUPO ${l}</div>`;
+                tmHtml += `<div class="p-2 bg-bissio-petrol rounded font-black text-[8px] uppercase text-bissio-sand tracking-widest font-quest">GRUPO ${l}</div>`;
                 for(let j=1; j<=4; j++) {
                     const id = `g${i*4+j}`;
-                    tmHtml += `<div class="flex items-center gap-2 bg-slate-900 p-2 rounded">
-                        <span class="text-[8px] text-slate-600 w-4">${id}</span>
-                        <input type="text" id="adm-tm-${id}" placeholder="Equipo" class="bg-transparent text-white text-[10px] outline-none w-full border-b border-slate-700">
-                    </div>`;
+                    tmHtml += `<div class="flex items-center gap-2 bg-bissio-forest p-2 rounded border border-bissio-petrol/30"><span class="text-[8px] text-bissio-sand/30 w-4 font-quest">${id}</span><input type="text" id="adm-tm-${id}" class="bg-transparent text-bissio-sand text-[10px] outline-none w-full border-b border-bissio-petrol uppercase font-bold"></div>`;
                 }
             });
-            tmHtml += `<div class="p-2 bg-slate-800 rounded font-black text-[8px] uppercase text-emerald-500 mt-4">ELIMINATORIAS (k1-k64)</div>`;
-            for(let i=1; i<=64; i++) {
-                const id = `k${i}`;
-                tmHtml += `<div class="flex items-center gap-2 bg-slate-900 p-1 rounded">
-                    <span class="text-[8px] text-slate-600 w-4">${id}</span>
-                    <input type="text" id="adm-tm-${id}" class="bg-transparent text-white text-[10px] outline-none w-full border-b border-slate-700">
-                </div>`;
-            }
             tmView.innerHTML = tmHtml;
             let scHtml = '';
             MATCH_DEFS.forEach(m => {
-                scHtml += `<div class="flex items-center justify-between bg-slate-800 p-2 rounded-lg border border-slate-700 text-[9px]">
-                    <span class="w-16 truncate uppercase">${m.id}. ${m.title}</span>
-                    <div class="flex gap-1">
-                        <input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-slate-900 text-center rounded border border-slate-600 text-emerald-400 font-bold">
-                        <input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-slate-900 text-center rounded border border-slate-600 text-emerald-400 font-bold">
-                    </div>
-                </div>`;
+                scHtml += `<div class="flex items-center justify-between bg-bissio-petrol p-2 rounded-lg border border-bissio-petrol/50 text-[9px]"><span class="w-16 truncate uppercase text-bissio-sand/50 font-quest">${m.id}. ${m.title}</span><div class="flex gap-1"><input type="number" id="adm-h-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"><input type="number" id="adm-a-${m.id}" class="w-7 h-7 bg-bissio-forest text-center rounded border border-bissio-sand/30 text-bissio-sand font-bold"></div></div>`;
             });
             scView.innerHTML = scHtml;
         }
@@ -302,10 +403,12 @@
                 if (h) h.value = scores.home;
                 if (a) a.value = scores.away;
             });
+            document.getElementById('adm-security-code').value = requiredAccessCode;
         }
 
         window.saveAdminData = async () => {
             const results = {}; const teams = {};
+            const newAccessCode = document.getElementById('adm-security-code').value.trim().toUpperCase();
             MATCH_DEFS.forEach(m => {
                 const h = document.getElementById(`adm-h-${m.id}`).value;
                 const a = document.getElementById(`adm-a-${m.id}`).value;
@@ -316,42 +419,9 @@
                 if (el) teams[id] = el.value;
             });
             try {
-                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, updatedAt: new Date().toISOString() });
-                showNotify("MUNDIAL ACTUALIZADO", "success");
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, accessCode: newAccessCode, updatedAt: new Date().toISOString() });
+                showNotify("ESTADIO ACTUALIZADO", "success");
             } catch (e) { showNotify("Error admin.", "error"); }
-        };
-
-        window.copyLink = () => {
-            const dummy = document.createElement('input');
-            document.body.appendChild(dummy);
-            dummy.value = window.location.href;
-            dummy.select();
-            document.execCommand('copy');
-            document.body.removeChild(dummy);
-            showNotify("LINK COPIADO. ¡Mandalo por WhatsApp!", "success");
-        };
-
-        window.adminClick = () => {
-            clickCount++;
-            if (clickCount >= 5) {
-                document.getElementById('admin-panel').classList.toggle('hidden');
-                document.getElementById('admin-hint').style.opacity = '1';
-                clickCount = 0;
-            }
-        };
-
-        window.switchTab = (tab) => {
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active', 'text-white'));
-            document.getElementById(`sec-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}`).classList.add('tab-active', 'text-white');
-        };
-
-        window.switchAdminTab = (t) => {
-            document.getElementById('admin-scores-view').classList.toggle('hidden', t !== 'scores');
-            document.getElementById('admin-teams-view').classList.toggle('hidden', t !== 'teams');
-            document.getElementById('tab-adm-teams').className = t === 'teams' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-emerald-500 text-slate-900 rounded-lg" : "flex-1 py-1 text-[8px] font-bold uppercase text-slate-400";
-            document.getElementById('tab-adm-scores').className = t === 'scores' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-emerald-500 text-slate-900 rounded-lg" : "flex-1 py-1 text-[8px] font-bold uppercase text-slate-400";
         };
 
         function calculatePoints(preds, reals) {
@@ -375,8 +445,8 @@
             list.innerHTML = '';
             sorted.forEach((p, idx) => {
                 const item = document.createElement('div');
-                item.className = `flex justify-between items-center bg-slate-900/50 p-4 rounded-2xl border border-slate-700 ${p.id === currentUserId ? 'border-emerald-500 ring-1 ring-emerald-500' : ''}`;
-                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-white italic uppercase">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-slate-600 font-bold">ID: ${p.id.substring(0, 6)}</span></div><div class="bg-emerald-500 text-slate-900 px-4 py-1.5 rounded-full text-xs font-black shadow-lg">${p.points} PTS</div>`;
+                item.className = `flex justify-between items-center bg-bissio-petrol/40 p-4 rounded-2xl border border-bissio-petrol/50 ${p.id === currentUserId ? 'border-bissio-sand ring-1 ring-bissio-sand shadow-xl' : ''}`;
+                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-bissio-sand italic uppercase font-quest">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-bissio-sand/50 font-bold uppercase tracking-widest">${p.email || '---'}</span></div><div class="bg-bissio-sand text-bissio-forest px-4 py-1.5 rounded-full text-xs font-black shadow-lg font-quest">${p.points} PTS</div>`;
                 list.appendChild(item);
             });
         }
@@ -400,10 +470,39 @@
             });
         }
 
+        window.adminClick = () => {
+            clickCount++;
+            if (clickCount >= 5) {
+                document.getElementById('admin-panel').classList.toggle('hidden');
+                document.getElementById('admin-hint').style.opacity = '1';
+                clickCount = 0;
+            }
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.remove('tab-active');
+                b.classList.add('text-bissio-sand/50');
+            });
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('tab-active');
+            document.getElementById(`btn-${tab}`).classList.remove('text-bissio-sand/50');
+        };
+
+        window.switchAdminTab = (t) => {
+            document.getElementById('admin-scores-view').classList.toggle('hidden', t !== 'scores');
+            document.getElementById('admin-teams-view').classList.toggle('hidden', t !== 'teams');
+            document.getElementById('admin-security-view').classList.toggle('hidden', t !== 'security');
+            document.getElementById('tab-adm-teams').className = t === 'teams' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
+            document.getElementById('tab-adm-scores').className = t === 'scores' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
+            document.getElementById('tab-adm-security').className = t === 'security' ? "flex-1 py-1 text-[8px] font-bold uppercase bg-bissio-sand text-bissio-forest rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
+        };
+
         function showNotify(msg, type) {
             const div = document.getElementById('notification');
             div.innerText = msg;
-            div.className = `fixed bottom-4 left-4 right-4 z-[60] p-4 rounded-xl border-2 flex items-center justify-center gap-3 shadow-2xl animate-bounce ${type === 'error' ? 'bg-red-500/20 border-red-500 text-red-200' : 'bg-emerald-500/20 border-emerald-500 text-emerald-200'}`;
+            div.className = `fixed bottom-4 left-4 right-4 z-[60] p-4 rounded-xl border-2 flex items-center justify-center gap-3 shadow-2xl animate-bounce ${type === 'error' ? 'bg-red-900/80 border-red-500 text-red-100 font-sans' : 'bg-bissio-sand text-bissio-forest font-quest'}`;
             div.classList.remove('hidden');
             setTimeout(() => div.classList.add('hidden'), 4000);
         }
