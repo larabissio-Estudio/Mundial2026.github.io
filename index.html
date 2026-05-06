@@ -29,7 +29,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Questrial&display=swap');
         
         html, body { 
-            background-color: rgb(28, 32, 64) !important; 
+            background-color: rgb(28, 32, 24) !important; 
             color: rgb(216, 203, 169);
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -86,7 +86,7 @@
                 </div>
                 <div>
                     <label class="block text-[10px] text-bissio-sand font-bold uppercase mb-1 ml-2 tracking-widest">Código de Acceso</label>
-                    <input type="text" id="access-code" placeholder="Pista: BISSIO2026" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-center text-lg font-black tracking-widest text-bissio-sand outline-none focus:border-bissio-sand uppercase shadow-inner">
+                    <input type="text" id="access-code" placeholder="CÓDIGO" class="w-full bg-bissio-forest border-2 border-bissio-sand/10 rounded-xl p-3 text-center text-lg font-black tracking-widest text-bissio-sand outline-none focus:border-bissio-sand uppercase shadow-inner">
                 </div>
             </div>
 
@@ -175,7 +175,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // CONFIGURACIÓN MAESTRA
@@ -232,20 +232,29 @@
         let authenticatedEmail = '';
         let clickCount = 0;
 
+        // Ocultar pantalla de carga a la fuerza si tarda mucho (Fallback)
+        setTimeout(() => {
+            const loader = document.getElementById('loading-overlay');
+            if(loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+        }, 2000);
+
         window.addEventListener('load', async () => {
             renderAdminForms();
             try {
-                await setPersistence(auth, browserLocalPersistence);
+                // Removimos la persistencia estricta que causa bloqueos en algunas PCs
                 await signInAnonymously(auth);
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error Auth:", e); }
         });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserId = user.uid;
-                document.getElementById('status-text').innerText = "ESTADIO CONECTADO";
-                document.getElementById('loading-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+                const loader = document.getElementById('loading-overlay');
+                if(loader) loader.style.display = 'none';
+                
                 listenToConfig();
                 listenToMyData();
                 listenToParticipants();
