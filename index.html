@@ -420,6 +420,14 @@
                     tmHtml += `<div class="flex items-center gap-2 bg-bissio-forest p-2 rounded"><span class="text-[8px] text-bissio-sand/30 w-4">${id}</span><input type="text" id="adm-tm-${id}" class="bg-transparent text-bissio-sand text-[10px] outline-none w-full border-b border-bissio-petrol uppercase font-bold"></div>`;
                 }
             });
+            
+            // --- NUEVO: Agregamos los inputs para las Fases Finales (k1 a k64) ---
+            tmHtml += `<div class="p-2 bg-bissio-petrol rounded font-black text-[8px] uppercase text-bissio-sand mt-4">FASES FINALES (CUPOS)</div>`;
+            for(let i=1; i<=64; i++) {
+                const id = `k${i}`;
+                tmHtml += `<div class="flex items-center gap-2 bg-bissio-forest p-2 rounded border border-bissio-petrol/30"><span class="text-[8px] text-bissio-sand/30 w-6 font-quest">${id}</span><input type="text" id="adm-tm-${id}" class="bg-transparent text-bissio-sand text-[10px] outline-none w-full border-b border-bissio-petrol uppercase font-bold" placeholder="Cupo ${i}"></div>`;
+            }
+
             tmView.innerHTML = tmHtml;
             let scHtml = '';
             MATCH_DEFS.forEach(m => {
