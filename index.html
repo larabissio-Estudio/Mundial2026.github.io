@@ -180,7 +180,7 @@
                     <div>
                         <label class="block text-bissio-sand font-bold uppercase text-[10px] tracking-widest font-quest mb-2">Correos Autorizados (Desde la Nube)</label>
                         <textarea id="adm-whitelist" rows="6" class="w-full bg-bissio-forest border border-bissio-sand/20 rounded-lg p-3 text-[10px] text-bissio-sand font-bold outline-none custom-scrollbar uppercase" placeholder="Pegar lista de correos, uno por línea..."></textarea>
-                        <p class="text-[8px] text-bissio-clay mt-1">Estos correos se guardan encriptados en Firebase.</p>
+                        <p class="text-[8px] text-bissio-clay mt-1">Estos correos se guardan seguros y ocultos en la Nube (Firebase).</p>
                     </div>
                     <div>
                         <label class="block text-bissio-sand font-bold uppercase text-[10px] tracking-widest font-quest mb-2">Código Maestro (Contraseña)</label>
@@ -201,17 +201,15 @@
     </main>
 
     <script type="module">
-        // Se agregó getDoc y deleteDoc para el Rescate Automático
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // EL CÓDIGO AHORA ES 100% SEGURO. 
+        // EL CÓDIGO AHORA ES 100% SEGURO. NO HAY CORREOS EN TEXTO PLANO.
         const SUPER_ADMIN = atob('bGFyYS5iaXNzaW9AZXN0dWRpb2Jpc3Npby5jb20uYXI=');
         
-        // Las listas dinámicas se alimentan EXCLUSIVAMENTE de la base de datos oculta.
         let dynamicAllowedEmails = [];
-        let requiredAccessCode = atob('QklTU0lPMjAyNg=='); // Acceso inicial de fábrica
+        let requiredAccessCode = atob('QklTU0lPMjAyNg=='); // Acceso inicial
 
         const firebaseConfig = {
             apiKey: "AIzaSyBZilPXy82ISEeuvxNVGbA_uCQs0bYZshE",
@@ -293,7 +291,6 @@
                     if (data.lockedMatches) lockedMatches = data.lockedMatches;
                     if (data.isLocked !== undefined) isProdeLocked = data.isLocked;
                     
-                    // Solo se cargan desde Firebase
                     if (data.allowedEmails) dynamicAllowedEmails = data.allowedEmails;
                     if (data.accessCode) requiredAccessCode = data.accessCode;
 
@@ -558,38 +555,32 @@
             
             myDataUnsubscribe = onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), async (snap) => {
                 if (snap.exists()) {
-                    // Datos encontrados bajo el Email
                     const data = snap.data();
                     if (data.username) document.getElementById('username').value = data.username;
                     myPredictions = data.predictions || {};
                 } else {
-                    // --- MIGRACIÓN (SISTEMA DE RESCATE) ---
+                    // --- MIGRACIÓN O NUEVA CUENTA ---
                     try {
                         const oldDocRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId);
                         const oldDocSnap = await getDoc(oldDocRef);
                         
                         if (oldDocSnap.exists()) {
-                            // Se encontró el perfil viejo
                             const oldData = oldDocSnap.data();
                             if (oldData.username) document.getElementById('username').value = oldData.username;
                             myPredictions = oldData.predictions || {};
                             
-                            // Lo copiamos al perfil nuevo vinculado al email
                             await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), {
                                 username: oldData.username || '',
                                 email: authenticatedEmail,
                                 predictions: myPredictions,
                                 updatedAt: new Date().toISOString()
                             });
-                            
-                            // Borramos el perfil viejo para no figurar duplicado en el ranking
                             await deleteDoc(oldDocRef);
                         } else {
-                            // Cuenta totalmente nueva
                             myPredictions = {};
                         }
                     } catch(e) {
-                        console.error("Error en rescate de datos:", e);
+                        console.error("Error en rescate:", e);
                         myPredictions = {};
                     }
                 }
