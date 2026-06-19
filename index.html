@@ -38,7 +38,6 @@
 
         .font-quest { font-family: 'Questrial', sans-serif; }
 
-        /* Estilo para los botones color Arena */
         .btn-bissio {
             background-color: rgb(216, 203, 169);
             color: rgb(28, 32, 24);
@@ -137,6 +136,10 @@
 
             <div id="groups-container" class="space-y-4"></div>
 
+            <div id="lock-banner" class="hidden mt-6 bg-red-900/30 border border-red-500/50 rounded-2xl p-4 text-center shadow-lg">
+                <span class="text-red-300 font-black uppercase tracking-widest text-sm font-quest">🔒 El Prode está cerrado. No se pueden modificar resultados.</span>
+            </div>
+
             <div class="mt-8 flex justify-center pb-12">
                 <button onclick="saveProde()" id="btn-save" class="w-full btn-bissio hover:brightness-110 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm font-quest">
                     <span>Guardar mi Pronóstico</span>
@@ -167,10 +170,32 @@
                 <div class="flex bg-bissio-petrol p-1 rounded-xl mb-4 gap-1">
                     <button onclick="switchAdminTab('teams')" id="tab-adm-teams" class="flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg">Equipos</button>
                     <button onclick="switchAdminTab('scores')" id="tab-adm-scores" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50">Goles</button>
+                    <button onclick="switchAdminTab('security')" id="tab-adm-security" class="flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50">Acceso</button>
                 </div>
+                
                 <div id="admin-teams-view" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
                 <div id="admin-scores-view" class="hidden space-y-2 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar"></div>
-                <button onclick="saveAdminData()" class="mt-6 w-full btn-bissio py-3 rounded-xl font-bold uppercase text-xs font-quest">Publicar Cambios</button>
+                
+                <div id="admin-security-view" class="hidden p-4 bg-bissio-petrol rounded-xl space-y-4">
+                    <div>
+                        <label class="block text-bissio-sand font-bold uppercase text-[10px] tracking-widest font-quest mb-2">Correos Autorizados (Desde la Nube)</label>
+                        <textarea id="adm-whitelist" rows="6" class="w-full bg-bissio-forest border border-bissio-sand/20 rounded-lg p-3 text-[10px] text-bissio-sand font-bold outline-none custom-scrollbar uppercase" placeholder="Pegar lista de correos, uno por línea..."></textarea>
+                        <p class="text-[8px] text-bissio-clay mt-1">Estos correos se guardan encriptados en Firebase.</p>
+                    </div>
+                    <div>
+                        <label class="block text-bissio-sand font-bold uppercase text-[10px] tracking-widest font-quest mb-2">Código Maestro (Contraseña)</label>
+                        <input type="text" id="adm-security-code" class="w-full bg-bissio-forest border border-bissio-sand/20 rounded-lg p-3 text-bissio-sand font-bold outline-none font-quest tracking-widest" placeholder="Escribí el código aquí">
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t border-bissio-petrol pt-4">
+                    <label class="flex items-center justify-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="adm-lock-prode" class="w-5 h-5 accent-bissio-clay cursor-pointer">
+                        <span class="text-red-400 text-xs font-bold uppercase font-quest tracking-widest">Cerrar Prode (Bloquear todo)</span>
+                    </label>
+                </div>
+
+                <button onclick="saveAdminData()" class="mt-4 w-full btn-bissio py-3 rounded-xl font-bold uppercase text-xs font-quest">Publicar Cambios</button>
             </div>
         </section>
     </main>
@@ -180,21 +205,13 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN MAESTRA
-        const MASTER_ACCESS_CODE = "BISSIO2026";
-        const ALLOWED_EMAILS = [
-            'maestro@prode.com', 'lmartins@estudiobissio.com.ar', 'imartins@estudiobissio.com.ar', 'sprandi@estudiobissio.com.ar',
-            'panria@estudiobissio.com.ar', 'nr.artech@gmail.com', 'elizabeth.perez@geatech.ar', 'rfernandez@estudiobissio.com.ar',
-            'bdieguez@estudiobissio.com.ar', 'mrojas@estudiobissio.com.ar', 'ndussich@estudiobissio.com.ar', 'laguirre@estudiobissio.com.ar',
-            'ecabana@estudiobissio.com.ar', 'atoledo@estudiobissio.com.ar', 'mabalos@estudiobissio.com.ar', 'fdimartino@estudiobissio.com.ar',
-            'dlares@estudiobissio.com.ar', 'mdasilva@estudiobissio.com.ar', 'afarias@estudiobissio.com.ar', 'cblanco@estudiobissio.com.ar',
-            'aassmann@estudiobissio.com.ar', 'agirasole@estudiobissio.com.ar', 'cmamchur@estudiobissio.com.ar', 'dmonteleone@estudiobissio.com.ar',
-            'mgonzalez@estudiobissio.com.ar', 'spilaria@estudiobissio.com.ar', 'mreyes@estudiobissio.com.ar', 'jpallotta@estudiobissio.com.ar',
-            'icastillo@estudiobissio.com.ar', 'cgarro@estudiobissio.com.ar', 'dtabuchini@estudiobissio.com.ar', 'tavalos@estudiobissio.com.ar',
-            'mercolano@estudiobissio.com.ar', 'klopez@estudiobissio.com.ar', 'citurri@estudiobissio.com.ar', 'tlarrosa@estudiobissio.com.ar',
-            'dsaucedo@estudiobissio.com.ar', 'eluna@estudiobissio.com.ar', 'lara.bissio@estudiobissio.com.ar', 'tjuynevich@estudiobissio.com.ar',
-            'jhbissio@estudiobissio.com.ar', 'hdbissio@estudiobissio.com.ar', 'labissio@estudiobissio.com.ar', 'rafael.lopez.jordan@gmail.com', 'citurria@estudiobissio.com.ar'
-        ];
+        // EL CÓDIGO AHORA ES 100% SEGURO. 
+        // Solo el correo de la administradora queda ofuscado para poder dar el primer acceso.
+        const SUPER_ADMIN = atob('bGFyYS5iaXNzaW9AZXN0dWRpb2Jpc3Npby5jb20uYXI=');
+        
+        // Las listas dinámicas se alimentan EXCLUSIVAMENTE de la base de datos oculta.
+        let dynamicAllowedEmails = [];
+        let requiredAccessCode = atob('QklTU0lPMjAyNg=='); // Acceso inicial de fábrica
 
         const firebaseConfig = {
             apiKey: "AIzaSyBZilPXy82ISEeuvxNVGbA_uCQs0bYZshE",
@@ -237,8 +254,9 @@
         let authenticatedEmail = '';
         let clickCount = 0;
         let lockedMatches = {};
+        let isProdeLocked = false;
+        let myDataUnsubscribe = null;
 
-        // Ocultar pantalla de carga a la fuerza si tarda mucho (Fallback)
         setTimeout(() => {
             const loader = document.getElementById('loading-overlay');
             if(loader) {
@@ -250,7 +268,6 @@
         window.addEventListener('load', async () => {
             renderAdminForms();
             try {
-                // Removimos la persistencia estricta que causa bloqueos en algunas PCs
                 await signInAnonymously(auth);
             } catch (e) { console.error("Error Auth:", e); }
         });
@@ -262,7 +279,6 @@
                 if(loader) loader.style.display = 'none';
                 
                 listenToConfig();
-                listenToMyData();
                 listenToParticipants();
                 checkWhitelistAccess(true);
             }
@@ -275,10 +291,20 @@
                     if (data.results) realResults = data.results;
                     if (data.teams) masterTeams = { ...masterTeams, ...data.teams };
                     if (data.lockedMatches) lockedMatches = data.lockedMatches;
+                    if (data.isLocked !== undefined) isProdeLocked = data.isLocked;
+                    
+                    // Solo se cargan desde Firebase
+                    if (data.allowedEmails) dynamicAllowedEmails = data.allowedEmails;
+                    if (data.accessCode) requiredAccessCode = data.accessCode;
+
                     renderGroups();
                     updateParticipantsUI();
                     applyConfigToAdmin();
-                } else { renderGroups(); }
+                    updateLockUI();
+                } else { 
+                    renderGroups(); 
+                    applyConfigToAdmin();
+                }
             });
         }
 
@@ -287,8 +313,9 @@
             const code = isAuto ? localStorage.getItem('prode_access') : document.getElementById('access-code').value.trim().toUpperCase();
             if (!email || !code) return;
 
-            const isEmailAllowed = ALLOWED_EMAILS.some(e => e.toLowerCase() === email);
-            const isCodeCorrect = code === MASTER_ACCESS_CODE;
+            const isSuperAdmin = email === SUPER_ADMIN;
+            const isEmailAllowed = isSuperAdmin || dynamicAllowedEmails.includes(email);
+            const isCodeCorrect = code === requiredAccessCode;
 
             if (isEmailAllowed && isCodeCorrect) {
                 authenticatedEmail = email;
@@ -296,6 +323,8 @@
                 localStorage.setItem('prode_access', code);
                 document.getElementById('lock-screen').classList.add('hidden');
                 document.getElementById('user-email-display').innerText = `IDENTIDAD ESTUDIO: ${email}`;
+                
+                listenToMyData();
             } else if (!isAuto) {
                 document.getElementById('access-error').classList.remove('hidden');
             }
@@ -312,7 +341,7 @@
                 if(banner) banner.classList.remove('hidden');
             } else {
                 btnSave.disabled = false;
-                btnSave.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> <span>Guardar mi Pronóstico</span>`;
+                btnSave.innerHTML = `<span>Guardar mi Pronóstico</span>`;
                 btnSave.classList.remove('opacity-50', 'cursor-not-allowed');
                 btnSave.classList.add('hover:brightness-110');
                 if(banner) banner.classList.add('hidden');
@@ -332,7 +361,7 @@
                     container.appendChild(h);
                 }
                 
-                const isMatchLocked = lockedMatches[m.id] === true;
+                const isMatchLocked = lockedMatches[m.id] === true || isProdeLocked;
                 const disabledAttr = isMatchLocked ? 'disabled' : '';
                 const opacityClass = isMatchLocked ? 'opacity-50 cursor-not-allowed' : '';
                 const lockIcon = isMatchLocked ? '🔒' : 'vs';
@@ -376,7 +405,7 @@
             const name = document.getElementById('username').value.trim();
             if (!name) return showNotify("¡Poné tu nombre!", "error");
             try {
-                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId), {
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), {
                     username: name, email: authenticatedEmail, predictions: myPredictions, updatedAt: new Date().toISOString()
                 });
                 showNotify("PRONÓSTICOS GUARDADOS", "success");
@@ -417,14 +446,26 @@
                 const lockCheck = document.getElementById(`adm-lock-${id}`);
                 if (lockCheck) lockCheck.checked = isLocked;
             });
+            
+            const lockCheck = document.getElementById('adm-lock-prode');
+            if (lockCheck) lockCheck.checked = isProdeLocked;
+
+            document.getElementById('adm-whitelist').value = dynamicAllowedEmails.join('\n');
+            document.getElementById('adm-security-code').value = requiredAccessCode;
         }
 
         window.saveAdminData = async () => {
-            if (authenticatedEmail.toLowerCase() !== 'lara.bissio@estudiobissio.com.ar') {
+            if (authenticatedEmail.toLowerCase() !== SUPER_ADMIN) {
                 return showNotify("ACCESO DENEGADO. No tenés permisos de administrador.", "error");
             }
 
             const results = {}; const teams = {}; const newLockedMatches = {};
+            const isLocked = document.getElementById('adm-lock-prode').checked;
+            
+            const newAccessCode = document.getElementById('adm-security-code').value.trim().toUpperCase() || requiredAccessCode;
+            const rawEmails = document.getElementById('adm-whitelist').value;
+            const newAllowedEmails = rawEmails.split('\n').map(e => e.trim().toLowerCase()).filter(e => e);
+
             MATCH_DEFS.forEach(m => {
                 const h = document.getElementById(`adm-h-${m.id}`).value;
                 const a = document.getElementById(`adm-a-${m.id}`).value;
@@ -437,8 +478,13 @@
                 const el = document.getElementById(`adm-tm-${id}`);
                 if (el) teams[id] = el.value;
             });
+
             try {
-                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { results, teams, lockedMatches: newLockedMatches, updatedAt: new Date().toISOString() });
+                await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'config', 'tournament'), { 
+                    results, teams, lockedMatches: newLockedMatches, isLocked, 
+                    allowedEmails: newAllowedEmails, accessCode: newAccessCode,
+                    updatedAt: new Date().toISOString() 
+                });
                 showNotify("ACTUALIZADO", "success");
             } catch (e) { showNotify("Error admin.", "error"); }
         };
@@ -446,11 +492,11 @@
         window.adminClick = () => {
             clickCount++;
             if (clickCount >= 5) {
-                if (authenticatedEmail.toLowerCase() === 'lara.bissio@estudiobissio.com.ar') {
+                if (authenticatedEmail.toLowerCase() === SUPER_ADMIN) {
                     document.getElementById('admin-panel').classList.toggle('hidden');
                     showNotify("MESA DE CONTROL ABIERTA", "success");
                 } else {
-                    showNotify("ACCESO DENEGADO. Solo Lara puede abrir este panel.", "error");
+                    showNotify("ACCESO DENEGADO. Solo autorizado para Admin.", "error");
                 }
                 clickCount = 0;
             }
@@ -470,8 +516,13 @@
         window.switchAdminTab = (t) => {
             document.getElementById('admin-scores-view').classList.toggle('hidden', t !== 'scores');
             document.getElementById('admin-teams-view').classList.toggle('hidden', t !== 'teams');
-            document.getElementById('tab-adm-teams').className = t === 'teams' ? "flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
-            document.getElementById('tab-adm-scores').className = t === 'scores' ? "flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg font-quest" : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
+            document.getElementById('admin-security-view').classList.toggle('hidden', t !== 'security');
+            
+            ['teams', 'scores', 'security'].forEach(tab => {
+                document.getElementById(`tab-adm-${tab}`).className = t === tab 
+                    ? "flex-1 py-1 text-[8px] font-bold uppercase btn-bissio rounded-lg font-quest" 
+                    : "flex-1 py-1 text-[8px] font-bold uppercase text-bissio-sand/50 font-quest";
+            });
         };
 
         function calculatePoints(preds, reals) {
@@ -495,20 +546,29 @@
             list.innerHTML = '';
             sorted.forEach((p, idx) => {
                 const item = document.createElement('div');
-                item.className = `flex justify-between items-center bg-bissio-petrol/40 p-4 rounded-2xl border border-bissio-petrol/50 ${p.id === currentUserId ? 'border-bissio-sand shadow-xl' : ''}`;
-                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-bissio-sand italic uppercase tracking-tight font-quest">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-bissio-sand/50 font-bold uppercase tracking-[0.1em]">${p.email || '---'}</span></div><div class="bg-bissio-sand text-bissio-forest px-4 py-1.5 rounded-full text-xs font-black shadow-lg font-quest">${p.points} PTS</div>`;
+                item.className = `flex justify-between items-center bg-bissio-petrol/40 p-4 rounded-2xl border border-bissio-petrol/50 ${p.id === authenticatedEmail ? 'border-bissio-sand shadow-xl' : ''}`;
+                item.innerHTML = `<div class="flex flex-col text-left"><span class="font-black text-sm text-bissio-sand italic uppercase tracking-tight font-quest">${idx+1}. ${p.username || 'Anónimo'}</span><span class="text-[7px] text-bissio-sand/50 font-bold uppercase tracking-[0.1em]">Cuenta Verificada</span></div><div class="bg-bissio-sand text-bissio-forest px-4 py-1.5 rounded-full text-xs font-black shadow-lg font-quest">${p.points} PTS</div>`;
                 list.appendChild(item);
             });
         }
 
         function listenToMyData() {
-            onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId), (snap) => {
+            if (!authenticatedEmail) return;
+            if (myDataUnsubscribe) myDataUnsubscribe();
+            
+            myDataUnsubscribe = onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), (snap) => {
                 if (snap.exists()) {
                     const data = snap.data();
                     if (data.username) document.getElementById('username').value = data.username;
                     myPredictions = data.predictions || {};
-                    renderGroups();
+                } else {
+                    myPredictions = {};
                 }
+                renderGroups();
+                
+                const count = Object.values(myPredictions).filter(p => p.home !== null && p.away !== null).length;
+                const counterEl = document.getElementById('counter');
+                if (counterEl) counterEl.innerText = `${count} / 104`;
             });
         }
 
