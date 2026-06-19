@@ -201,12 +201,12 @@
     </main>
 
     <script type="module">
+        // Se agregó getDoc y deleteDoc para el Rescate Automático
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // EL CÓDIGO AHORA ES 100% SEGURO. 
-        // Solo el correo de la administradora queda ofuscado para poder dar el primer acceso.
         const SUPER_ADMIN = atob('bGFyYS5iaXNzaW9AZXN0dWRpb2Jpc3Npby5jb20uYXI=');
         
         // Las listas dinámicas se alimentan EXCLUSIVAMENTE de la base de datos oculta.
@@ -556,16 +556,45 @@
             if (!authenticatedEmail) return;
             if (myDataUnsubscribe) myDataUnsubscribe();
             
-            myDataUnsubscribe = onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), (snap) => {
+            myDataUnsubscribe = onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), async (snap) => {
                 if (snap.exists()) {
+                    // Datos encontrados bajo el Email
                     const data = snap.data();
                     if (data.username) document.getElementById('username').value = data.username;
                     myPredictions = data.predictions || {};
                 } else {
-                    myPredictions = {};
+                    // --- MIGRACIÓN (SISTEMA DE RESCATE) ---
+                    try {
+                        const oldDocRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', currentUserId);
+                        const oldDocSnap = await getDoc(oldDocRef);
+                        
+                        if (oldDocSnap.exists()) {
+                            // Se encontró el perfil viejo
+                            const oldData = oldDocSnap.data();
+                            if (oldData.username) document.getElementById('username').value = oldData.username;
+                            myPredictions = oldData.predictions || {};
+                            
+                            // Lo copiamos al perfil nuevo vinculado al email
+                            await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'predictions', authenticatedEmail), {
+                                username: oldData.username || '',
+                                email: authenticatedEmail,
+                                predictions: myPredictions,
+                                updatedAt: new Date().toISOString()
+                            });
+                            
+                            // Borramos el perfil viejo para no figurar duplicado en el ranking
+                            await deleteDoc(oldDocRef);
+                        } else {
+                            // Cuenta totalmente nueva
+                            myPredictions = {};
+                        }
+                    } catch(e) {
+                        console.error("Error en rescate de datos:", e);
+                        myPredictions = {};
+                    }
                 }
-                renderGroups();
                 
+                renderGroups();
                 const count = Object.values(myPredictions).filter(p => p.home !== null && p.away !== null).length;
                 const counterEl = document.getElementById('counter');
                 if (counterEl) counterEl.innerText = `${count} / 104`;
